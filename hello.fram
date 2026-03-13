@@ -1,0 +1,16 @@
+let _ = printStrLn "Hello, World!"
+
+{#!
+To jest funkcja, która coś robi.
+!#}
+let funkcja 
+  x 
+
+  = 
+
+
+  23    
+        +       x
+
+{#! To jest druga funkcja !#}
+let fun2 x y = x y

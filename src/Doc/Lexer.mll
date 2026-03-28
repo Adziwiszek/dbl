@@ -8,30 +8,39 @@
     let content = String.trim (Buffer.contents doc_buffer) in
     doc_comments := (name, content, line) :: !doc_comments;
     Buffer.clear doc_buffer
+
+  let reset_doc () =
+    doc_string := "";
+    Buffer.clear doc_buffer;
+    doc_comments := []
+
 }
 
 rule doc_begin = parse
-  | "{#!" { doc_end lexbuf }
+  | "##" { doc_end true lexbuf }
+  | "{##" { doc_end false lexbuf }
   | '\n' { Lexing.new_line lexbuf; doc_begin lexbuf }
   | eof { () }
   | _ { doc_begin lexbuf }
 
-and doc_end = parse
-  | "!#}" { let_begin lexbuf}
+and doc_end one_liner = parse
+  | "##}" { let_begin lexbuf}
   | '\n' {
     Lexing.new_line lexbuf;
     Buffer.add_char doc_buffer '\n';
-    doc_end lexbuf
+    if one_liner 
+    then let_begin lexbuf
+    else doc_end one_liner lexbuf
   }
   | _ as c { 
     Buffer.add_char doc_buffer c;
-    doc_end lexbuf 
+    doc_end one_liner lexbuf 
   }
 
 and let_begin = parse
   | '\n' { Lexing.new_line lexbuf; let_begin lexbuf }
   | [' ' '\t' ]+ { let_begin lexbuf }
-  | "let" | "let ret" { 
+  | "pub let" | "pub let rec" |"let" | "let ret" { 
     extract_name lexbuf
   }
   | _ { Buffer.clear doc_buffer; doc_begin lexbuf }
@@ -47,6 +56,7 @@ and extract_name = parse
 
 {
   let main fname =
+    reset_doc ();
     let inchan = open_in fname in 
     let lexbuf = Lexing.from_channel inchan in
     doc_begin lexbuf;

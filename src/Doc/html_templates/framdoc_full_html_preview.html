@@ -1,0 +1,141 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.doc-shell{display:grid;grid-template-columns:200px 1fr;gap:0;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);overflow:hidden;min-height:500px}
+.doc-sidebar{background:var(--color-background-secondary);border-right:0.5px solid var(--color-border-tertiary);padding:12px;display:flex;flex-direction:column;gap:4px}
+.doc-sidebar-title{font-size:11px;font-weight:500;color:var(--color-text-tertiary);letter-spacing:.07em;text-transform:uppercase;padding:4px 6px 8px}
+.mod-btn{display:flex;justify-content:space-between;align-items:center;padding:6px 8px;border-radius:var(--border-radius-md);cursor:pointer;font-size:13px;color:var(--color-text-secondary);border:none;background:none;width:100%;text-align:left}
+.mod-btn:hover{background:var(--color-background-primary);color:var(--color-text-primary)}
+.mod-btn.active{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary)}
+.mod-btn .cnt{font-size:11px;color:var(--color-text-tertiary);background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:10px;padding:1px 6px}
+.doc-main{display:flex;flex-direction:column;overflow:hidden}
+.doc-topbar{padding:12px 16px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;gap:8px;align-items:center}
+.search-box{position:relative;flex:1}
+.search-box svg{position:absolute;left:9px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--color-text-tertiary);pointer-events:none}
+.search-box input{width:100%;padding:7px 10px 7px 30px;font-size:13px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary)}
+.filter-row{display:flex;gap:6px;align-items:center;padding:0 16px 12px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.tag-btn{font-size:11px;padding:3px 9px;border-radius:10px;border:0.5px solid var(--color-border-tertiary);background:none;color:var(--color-text-secondary);cursor:pointer}
+.tag-btn.on{background:var(--color-background-info);border-color:var(--color-border-info);color:var(--color-text-info)}
+.results-label{font-size:11px;color:var(--color-text-tertiary);margin-left:auto}
+.doc-content{padding:12px 16px;overflow-y:auto;max-height:400px;display:flex;flex-direction:column;gap:8px}
+.def-card{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px 14px;cursor:pointer;transition:border-color .1s}
+.def-card:hover{border-color:var(--color-border-secondary)}
+.def-card.expanded{border-color:var(--color-border-secondary);background:var(--color-background-secondary)}
+.def-header{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.def-name{font-family:var(--font-mono);font-size:14px;font-weight:500;color:var(--color-text-primary)}
+.def-mod{font-size:11px;color:var(--color-text-tertiary);background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:4px;padding:1px 6px}
+.def-line{font-size:11px;color:var(--color-text-tertiary);margin-left:auto}
+.def-sig{font-family:var(--font-mono);font-size:12px;color:var(--color-text-secondary);margin-top:4px}
+.def-doc{font-size:13px;color:var(--color-text-secondary);margin-top:8px;line-height:1.6;display:none}
+.def-card.expanded .def-doc{display:block}
+.hl{background:#fef3c7;border-radius:2px;padding:0 1px;color:#92400e}
+.empty{padding:2rem;text-align:center;font-size:13px;color:var(--color-text-tertiary)}
+.kbd{display:inline-block;font-family:var(--font-mono);font-size:10px;border:0.5px solid var(--color-border-secondary);border-radius:3px;padding:1px 4px;color:var(--color-text-tertiary)}
+</style>
+
+<div class="doc-shell">
+  <div class="doc-sidebar">
+    <div class="doc-sidebar-title">Modules</div>
+    <button class="mod-btn active" onclick="setMod(null,this)">
+      All modules<span class="cnt" id="cnt-all">7</span>
+    </button>
+    <button class="mod-btn" onclick="setMod('Main',this)">
+      Main<span class="cnt">3</span>
+    </button>
+    <button class="mod-btn" onclick="setMod('Lexer',this)">
+      Lexer<span class="cnt">2</span>
+    </button>
+    <button class="mod-btn" onclick="setMod('Utils',this)">
+      Utils<span class="cnt">2</span>
+    </button>
+  </div>
+
+  <div class="doc-main">
+    <div class="doc-topbar">
+      <div class="search-box">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4.5"/><line x1="10" y1="10" x2="14" y2="14"/></svg>
+        <input id="q" placeholder="Search names and docs…" oninput="render()" autofocus />
+      </div>
+    </div>
+    <div class="filter-row">
+      <span style="font-size:11px;color:var(--color-text-tertiary)">Show:</span>
+      <button class="tag-btn on" onclick="toggleTag('val',this)">val</button>
+      <button class="tag-btn on" onclick="toggleTag('let rec',this)">let rec</button>
+      <button class="tag-btn on" onclick="toggleTag('type',this)">type</button>
+      <span class="results-label" id="res-count">7 results</span>
+    </div>
+    <div class="doc-content" id="cards"></div>
+  </div>
+</div>
+
+<script>
+const DATA = [
+  {mod:'Main', name:'find_definition', kind:'let rec', line:89, sig:'int -> Lang.Unif.expr -> Lang.Unif.expr', doc:'Takes a line number and a program AST, then recursively searches for the definition node whose start line matches. Raises Failure with an error code if an unsupported expression variant is encountered.'},
+  {mod:'Main', name:'make_paragraph', kind:'val', line:120, sig:'string -> string -> int -> string', doc:'Creates an HTML &lt;pre&gt; block for a single documentation entry. Takes the function name, its doc string, and the source line number.'},
+  {mod:'Main', name:'squeeze_spaces', kind:'val', line:55, sig:'string -> string', doc:'Collapses runs of whitespace in a string into a single space. Used to normalise doc comment text before embedding it in HTML output.'},
+  {mod:'Lexer', name:'doc_begin', kind:'val', line:12, sig:'Lexing.lexbuf -> unit', doc:'Entry rule of the lexer. Scans input discarding tokens until it finds the opening delimiter {##, then delegates to doc_end.'},
+  {mod:'Lexer', name:'main', kind:'val', line:78, sig:'string -> (string * string * int) list', doc:'Opens a source file by path, runs the lexer over it, and returns the collected doc comments as a list of (name, content, line) triples in source order.'},
+  {mod:'Utils', name:'collect_files', kind:'let rec', line:5, sig:'string -> string list', doc:'Recursively traverses a directory and returns a flat list of all .fram files found. Ignores hidden entries and non-directory files with other extensions.'},
+  {mod:'Utils', name:'write_index', kind:'val', line:30, sig:'module_doc list -> unit', doc:'Generates index.html in the output directory. Links to every module page and shows the definition count for each.'},
+];
+
+let activeMod = null;
+let activeTags = new Set(['val','let rec','type']);
+let expanded = null;
+
+function setMod(mod, btn) {
+  activeMod = mod;
+  document.querySelectorAll('.mod-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function toggleTag(tag, btn) {
+  if (activeTags.has(tag)) activeTags.delete(tag);
+  else activeTags.add(tag);
+  btn.classList.toggle('on', activeTags.has(tag));
+  render();
+}
+
+function hl(str, q) {
+  if (!q) return str;
+  const re = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
+  return str.replace(re, '<span class="hl">$1</span>');
+}
+
+function render() {
+  const q = document.getElementById('q').value.trim().toLowerCase();
+  const filtered = DATA.filter(d => {
+    if (activeMod && d.mod !== activeMod) return false;
+    if (!activeTags.has(d.kind)) return false;
+    if (q && !d.name.toLowerCase().includes(q) && !d.doc.toLowerCase().includes(q) && !d.sig.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  document.getElementById('res-count').textContent = `${filtered.length} result${filtered.length!==1?'s':''}`;
+  const el = document.getElementById('cards');
+  if (!filtered.length) {
+    el.innerHTML = '<div class="empty">No matching definitions.</div>';
+    return;
+  }
+  el.innerHTML = filtered.map((d,i) => {
+    const isExp = expanded === d.name;
+    return `<div class="def-card${isExp?' expanded':''}" onclick="toggle('${d.name}')">
+      <div class="def-header">
+        <span class="def-name">${hl(d.name, q)}</span>
+        <span class="def-mod">${d.mod}</span>
+        <span class="def-mod" style="background:none">${d.kind}</span>
+        <span class="def-line">line ${d.line}</span>
+      </div>
+      <div class="def-sig">${hl(d.sig, q)}</div>
+      <div class="def-doc">${hl(d.doc, q)}</div>
+    </div>`;
+  }).join('');
+}
+
+function toggle(name) {
+  expanded = expanded === name ? null : name;
+  render();
+}
+
+render();
+</script>

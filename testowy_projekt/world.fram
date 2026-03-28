@@ -1,0 +1,8 @@
+{## funkcja witająca
+##}
+let hello_world x = x
+
+{##
+funkcja robiąca
+##}
+let moja_funkcja x = 67 * x

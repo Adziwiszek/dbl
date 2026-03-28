@@ -1,0 +1,371 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FramDoc</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            max-width: 700px;
+            margin: 40px auto;
+            line-height: 1.6;
+        }
+    </style>
+    <script>
+    const input = document.getElementById('search');
+    input.addEventListener('input', () => {
+      const q = input.value.toLowerCase();
+      const results = SEARCH_DATA.filter(e =>
+        e.name.toLowerCase().includes(q) ||
+        e.doc.toLowerCase().includes(q)
+      );
+      document.getElementById('results').innerHTML =
+        results.map(e =>
+          `<li><a href="${e.url}">${e.module}.${e.name}</a> — ${e.doc.slice(0,80)}…</li>`
+        ).join('');
+    });
+    </script>
+</head>
+
+<body>
+    <h1><a href="index.html">Dokumentacja</a></h1>
+    <h2><a href="search.html">Wyszukiwarka</a></h2>
+
+<h2>List</h2><section id="length">
+               <h3><code>val length</code> <span class="line">line 15</span></h3>
+               <p>Returns the length of a list (number of elements).</p>
+             </section>
+<section id="hd">
+               <h3><code>val hd</code> <span class="line">line 24</span></h3>
+               <p>Returns the first element of a list or `None` if it's empty.</p>
+             </section>
+<section id="hdErr">
+               <h3><code>val hdErr</code> <span class="line">line 35</span></h3>
+               <p>Returns the first element of a list or calls `~onError` if it's empty.
+
+  @param ~onError Fallback function for an empty list.</p>
+             </section>
+<section id="tl">
+               <h3><code>val tl</code> <span class="line">line 42</span></h3>
+               <p>Returns the list without its first element or `None` if it's empty.</p>
+             </section>
+<section id="tlErr">
+               <h3><code>val tlErr</code> <span class="line">line 53</span></h3>
+               <p>Returns the list without its first element or calls `~onError` if it's empty.
+
+  @param ~onError Fallback function for an empty list.</p>
+             </section>
+<section id="dropLast">
+               <h3><code>val dropLast</code> <span class="line">line 63</span></h3>
+               <p>Returns the list without the last element or returns `None` if it already
+  was empty.</p>
+             </section>
+<section id="dropLastErr">
+               <h3><code>val dropLastErr</code> <span class="line">line 80</span></h3>
+               <p>Returns the list without the last element or calls `~onError` if it already
+  was empty.
+
+  @param ~onError Fallback function in case of an empty list.</p>
+             </section>
+<section id="nth">
+               <h3><code>val nth</code> <span class="line">line 95</span></h3>
+               <p>Returns the n-th element of a list or `None` if n is negative or the list
+  is too short. The first element is at position 0.</p>
+             </section>
+<section id="nthErr">
+               <h3><code>val nthErr</code> <span class="line">line 109</span></h3>
+               <p>Returns the n-th element of a list or calls `~onError` if n is negative
+  or the list is too short. The first element is at position 0.
+
+  @param ~onError Fallback function for an empty list or negative index.</p>
+             </section>
+<section id="last">
+               <h3><code>val last</code> <span class="line">line 120</span></h3>
+               <p>Returns the last element of a list or `None` if the list is empty.</p>
+             </section>
+<section id="lastErr">
+               <h3><code>val lastErr</code> <span class="line">line 136</span></h3>
+               <p>Returns the last element of a list or calls `~onError` if list is empty.
+
+  @param ~onError Fallback for an empty list.</p>
+             </section>
+<section id="dropTakeLast">
+               <h3><code>val dropTakeLast</code> <span class="line">line 152</span></h3>
+               <p>Returns pair of combined results of `last` and `dropLast` functions,
+  but performs this computation in more optimized manner. Returns
+  `None` for an empty list.</p>
+             </section>
+<section id="dropTakeLastErr">
+               <h3><code>val dropTakeLastErr</code> <span class="line">line 172</span></h3>
+               <p>Returns pair of combined results of `last` and `dropLast` functions,
+  but performs this computation in more optimized manner. Calls `~onError` for
+  an empty list.
+
+  @param ~onError Fallback for an empty list.</p>
+             </section>
+<section id="append">
+               <h3><code>val append</code> <span class="line">line 186</span></h3>
+               <p>Appends `ys` to `xs`.</p>
+             </section>
+<section id="revAppend">
+               <h3><code>val revAppend</code> <span class="line">line 193</span></h3>
+               <p>Reverses the first argument and appends it to the second argument.</p>
+             </section>
+<section id="rev">
+               <h3><code>val rev</code> <span class="line">line 200</span></h3>
+               <p>Returns the given list reversed.</p>
+             </section>
+<section id="concat">
+               <h3><code>val concat</code> <span class="line">line 206</span></h3>
+               <p>Concatenates a list of lists. The elements of the given list are appended
+  to each other consecutively.</p>
+             </section>
+<section id="map">
+               <h3><code>val map</code> <span class="line">line 216</span></h3>
+               <p>`map f xs` applies `f` to elements of `xs` and returns a list
+  constructed from the results of these applications.</p>
+             </section>
+<section id="mapi">
+               <h3><code>val mapi</code> <span class="line">line 228</span></h3>
+               <p>Same as `List.map` but its argument `f` takes an additional argument which
+  corresponds to index position of its first argument in `xs`.
+
+  @param ?i Initial value of the iterator index. Defaults to 0.</p>
+             </section>
+<section id="map2">
+               <h3><code>val map2</code> <span class="line">line 245</span></h3>
+               <p>`map2 f xs ys` returns a list constructed by applying `f` to consecutive
+  pairs of elements from `xs` and `ys`.
+  Calls `~onError` if the lists have different lengths.
+
+  @param ~onError Fallback function for lists of different lengths.</p>
+             </section>
+<section id="revMapAppend">
+               <h3><code>val revMapAppend</code> <span class="line">line 255</span></h3>
+               <p>`revMapAppend f xs ys` maps `f` onto reversed `xs` and appends it to `ys`.</p>
+             </section>
+<section id="revMap">
+               <h3><code>val revMap</code> <span class="line">line 262</span></h3>
+               <p>`revMap f xs` returns `f` mapped onto reversed `xs`.</p>
+             </section>
+<section id="revMap2">
+               <h3><code>val revMap2</code> <span class="line">line 271</span></h3>
+               <p>`revMap2 f xs ys` returns a list constructed by applying `f` to consecutive
+  pairs of elements from reversed `xs` and `ys`.
+  Calls `~onError` if the lists have different lengths.
+
+  @param ~onError Fallback function for lists of different lengths.</p>
+             </section>
+<section id="filter">
+               <h3><code>val filter</code> <span class="line">line 281</span></h3>
+               <p>`filter p xs` returns list of elements of `xs` which satisfy predicate `p`.</p>
+             </section>
+<section id="filteri">
+               <h3><code>val filteri</code> <span class="line">line 293</span></h3>
+               <p>Same as `List.filter` but its argument `p` takes an additional argument which
+  corresponds to index position of its first argument in `xs`.
+
+  @param ?i Initial value of the iterator index. Defaults to 0.</p>
+             </section>
+<section id="filterMap">
+               <h3><code>val filterMap</code> <span class="line">line 309</span></h3>
+               <p>Same as `List.filter` but `f` returns an `Option`. Returns a list of
+  arguments on which `f` returned `Some`.</p>
+             </section>
+<section id="filterMapi">
+               <h3><code>val filterMapi</code> <span class="line">line 324</span></h3>
+               <p>Same as `List.filterMap` and `List.filteri`.
+
+  @param ?i Initial value of the iterator index. Defaults to 0.</p>
+             </section>
+<section id="concatMap">
+               <h3><code>val concatMap</code> <span class="line">line 339</span></h3>
+               <p>`concatMap f xs` maps `f` onto `xs` and then concatenates the result.</p>
+             </section>
+<section id="take">
+               <h3><code>val take</code> <span class="line">line 344</span></h3>
+               <p>Returns prefix of length n of a list or the list itself if it's shorter than n.</p>
+             </section>
+<section id="drop">
+               <h3><code>val drop</code> <span class="line">line 351</span></h3>
+               <p>Returns suffix of a list after n elements or `[]` if it's shorter than n.</p>
+             </section>
+<section id="takeWhile">
+               <h3><code>val takeWhile</code> <span class="line">line 359</span></h3>
+               <p>Returns the longest prefix of a list of which elements satisfy `p`.</p>
+             </section>
+<section id="dropWhile">
+               <h3><code>val dropWhile</code> <span class="line">line 366</span></h3>
+               <p>Returns the longest suffix of a list of which first element satisfies `p`.</p>
+             </section>
+<section id="iter">
+               <h3><code>val iter</code> <span class="line">line 373</span></h3>
+               <p>`iter f xs` applies `f` to all elements of `xs` in order.</p>
+             </section>
+<section id="iteri">
+               <h3><code>val iteri</code> <span class="line">line 386</span></h3>
+               <p>Same as `List.iter` but it takes an additional optional parameter `i`
+  which is incremented with every consecutive application of `f`, which itself
+  takes an additional argument.
+
+  @param ?i Initial value of the iterator index. Defaults to 0.</p>
+             </section>
+<section id="iter2">
+               <h3><code>val iter2</code> <span class="line">line 402</span></h3>
+               <p>Applies a function to consecutive pairs of elements of the given lists.
+  Calls `~onError` if the lists have different lengths.
+
+  @param ~onError Fallback function for lists of different lengths.</p>
+             </section>
+<section id="init">
+               <h3><code>val init</code> <span class="line">line 418</span></h3>
+               <p>`init n f` returns a list of n elements constructed by applying `f` to
+  the index of current element. Optional parameter `i` sets the value of the
+  starting index which by default is 0.
+
+  @param ?i Initial value of the iterator index. Defaults to 0.</p>
+             </section>
+<section id="foldLeft">
+               <h3><code>val foldLeft</code> <span class="line">line 429</span></h3>
+               <p>`foldLeft f init [x1, x2, ... ,xn]` is `f (... (f (f init x1) x2) ...) xn`.</p>
+             </section>
+<section id="foldLeft1">
+               <h3><code>val foldLeft1</code> <span class="line">line 439</span></h3>
+               <p>`foldLeft1 f [x1, x2, ... ,xn]` is `f (... (f (f x1 x2) x3) ...) xn`.
+ Returns `None` in case of an empty list.</p>
+             </section>
+<section id="foldLeft1Err">
+               <h3><code>val foldLeft1Err</code> <span class="line">line 451</span></h3>
+               <p>`foldLeft1Err f [x1, x2, ... ,xn]` is `f (... (f (f x1 x2) x3) ...) xn`.
+ Returns `~onError` in case of an empty list.
+
+ @param ~onError Fallback for an empty list.</p>
+             </section>
+<section id="foldRight">
+               <h3><code>val foldRight</code> <span class="line">line 458</span></h3>
+               <p>`foldRight f [x1, x2, ..., xn] init` is `f x1 (f x2 (... (f xn init)))`.</p>
+             </section>
+<section id="foldRight1">
+               <h3><code>val foldRight1</code> <span class="line">line 468</span></h3>
+               <p>`foldRight1 f [x1, x2, ..., xn]` is `f x1 (... (f x(n-1) xn)))`.
+  Returns `None` for an empty list.</p>
+             </section>
+<section id="foldRight1Err">
+               <h3><code>val foldRight1Err</code> <span class="line">line 485</span></h3>
+               <p>`foldRight1Err f [x1, x2, ..., xn]` is `f x1 (... (f x(n-1) xn)))`.
+  Calls `~onError` for an empty list.
+
+  @param ~onError Fallback for an empty list.</p>
+             </section>
+<section id="foldLeft2">
+               <h3><code>val foldLeft2</code> <span class="line">line 503</span></h3>
+               <p>`foldLeft2 f init xs ys` works the same as `List.foldLeft` but `f` is
+  applied to consecutive pairs of elements from `xs` and `ys`.
+  Calls `~onError` if the lists have different lengths.
+
+  @param ~onError Fallback function for lists of different lengths.</p>
+             </section>
+<section id="foldRight2">
+               <h3><code>val foldRight2</code> <span class="line">line 517</span></h3>
+               <p>Same as `List.foldRight` and `List.foldLeft2`.
+
+  @param ~onError Fallback function for lists of different lengths.</p>
+             </section>
+<section id="forAll">
+               <h3><code>val forAll</code> <span class="line">line 527</span></h3>
+               <p>Checks if all elements of a list satisfy a predicate.</p>
+             </section>
+<section id="forAll2">
+               <h3><code>val forAll2</code> <span class="line">line 539</span></h3>
+               <p>Checks if all consecutive pairs of elements of the given lists satisfy `p`.
+  Calls `~onError` if the lists have different lengths.
+
+  @param ~onError Fallback function for lists of different lengths.</p>
+             </section>
+<section id="exists">
+               <h3><code>val exists</code> <span class="line">line 549</span></h3>
+               <p>Checks if a list contains an element which satisfies a predicate.</p>
+             </section>
+<section id="exists2">
+               <h3><code>val exists2</code> <span class="line">line 562</span></h3>
+               <p>Checks if there exists a pair of elements at the same position
+  in the given lists that satisfies `p`.
+  Calls `~onError` if the lists have different lengths.
+
+  @param ~onError Fallback function for lists of different lengths.</p>
+             </section>
+<section id="find">
+               <h3><code>val find</code> <span class="line">line 575</span></h3>
+               <p>Returns the first element of a list that satisfies `p` or `None` if
+  there is no such element.</p>
+             </section>
+<section id="findErr">
+               <h3><code>val findErr</code> <span class="line">line 587</span></h3>
+               <p>Returns the first element of a list that satisfies `p` or calls `~onError` if
+  there is no such element.
+
+  @param ~onError Fallback function in case the predicate is not satisfied.</p>
+             </section>
+<section id="findIndex">
+               <h3><code>val findIndex</code> <span class="line">line 599</span></h3>
+               <p>Returns the index of the first element of a list that satisfies `p` or `None`
+  if there is no such element.</p>
+             </section>
+<section id="findIndexErr">
+               <h3><code>val findIndexErr</code> <span class="line">line 613</span></h3>
+               <p>Returns the index of the first element of a list that satisfies `p` or calls
+  `~onError` if there is no such element.
+
+  @param ~onError Fallback function in case the predicate is not satisfied.</p>
+             </section>
+<section id="findMap">
+               <h3><code>val findMap</code> <span class="line">line 625</span></h3>
+               <p>Returns the first non-`None` result from iteratively applying `f` to each
+  element of the given list or `None` if there is no such result.</p>
+             </section>
+<section id="findMapErr">
+               <h3><code>val findMapErr</code> <span class="line">line 641</span></h3>
+               <p>Returns the first non-`None` value from iteratively applying `f` to each
+  element of the given list or calls `~onError` if there is no such result.
+
+  @param ~onError Fallback function in case the all results are `None`.</p>
+             </section>
+<section id="findMapi">
+               <h3><code>val findMapi</code> <span class="line">line 659</span></h3>
+               <p>Same as `List.findMap` but its argument `f` takes an additional argument which
+  corresponds to index position of its first argument in `xs`.
+
+  @param ?i Initial value of the iterator index. Defaults to 0.</p>
+             </section>
+<section id="findMapiErr">
+               <h3><code>val findMapiErr</code> <span class="line">line 680</span></h3>
+               <p>Same as `List.findMapErr` but its argument `f` takes an additional argument which
+  corresponds to index position of its first argument in `xs`.
+
+  @param ~onError Fallback function in case all results are `None`.
+  @param ?i Initial value of the iterator index. Defaults to 0.</p>
+             </section>
+<section id="foldLeftMap">
+               <h3><code>val foldLeftMap</code> <span class="line">line 699</span></h3>
+               <p>Returns a pair of which first element is the same as `List.foldLeft` and its
+  second element is a new list. `f` returns a pair of values, first being the
+  new accumulator and second being a value added to the list in the result.</p>
+             </section>
+<section id="foldLeftFilterMap">
+               <h3><code>val foldLeftFilterMap</code> <span class="line">line 713</span></h3>
+               <p>Same as `List.foldLeftMap` but `f` returns an `Option` and the accumulator
+  and constructed list are updated when the result of `f` is not `None`.</p>
+             </section>
+<section id="foldLeftConcatMap">
+               <h3><code>val foldLeftConcatMap</code> <span class="line">line 726</span></h3>
+               <p>Same as `List.foldLeftMap` but it concatenates the new list.</p>
+             </section>
+<section id="equal">
+               <h3><code>val equal</code> <span class="line">line 747</span></h3>
+               <p>Checks if two lists have the same lengths and their elements at corresponding
+  positions are equal.</p>
+             </section>
+
+</body>
+</html>

@@ -1,0 +1,2 @@
+{## osobna funkcja ##}
+let dodawanie (x: Int) (y: Int) = x + y

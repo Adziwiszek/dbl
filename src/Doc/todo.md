@@ -1,0 +1,7 @@
+- dodać sczytywanie innych, niż let, definicji
+- dodać renderowanie markdown
+- dodać opcje (tylko pub definicje, ...)
+- zwijanie definicji w dokumentacji
+- ładny css
+- ukraść typy z interpretera i je pokazać
+- wyszukiwanie typów z wildcard'em (maybe)

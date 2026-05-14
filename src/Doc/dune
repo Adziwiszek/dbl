@@ -12,4 +12,5 @@
     interpLib
     typeInference
     toCore
-    effectInference))
+    effectInference)
+  )

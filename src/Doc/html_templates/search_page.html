@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>FramDoc</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+<h1><a href="index.html">Dokumentacja</a></h1>
+<div class="doc-shell">
+  <div class="doc-sidebar">
+    <div class="doc-sidebar-title">Modules</div>
+    <button class="mod-btn active" onclick="setMod(null,this)">
+      All<span class="cnt">%d</span>
+    </button>
+    %s
+  </div>
+  <div class="doc-main">
+    <div class="doc-topbar">
+      <div class="search-box">
+        <input id="q" placeholder="Search names and docs..." oninput="render()" />
+      </div>
+    </div>
+    <div class="filter-row">
+      <button class="tag-btn on" onclick="toggleTag('val',this)">val</button>
+      <button class="tag-btn on" onclick="toggleTag('let rec',this)">let rec</button>
+      <button class="tag-btn on" onclick="toggleTag('type',this)">type</button>
+      <span class="results-label" id="res-count"></span>
+    </div>
+    <div class="doc-content" id="cards"></div>
+  </div>
+</div>
+
+<script>
+const DATA = [
+    %s
+];
+
+let activeMod = null;
+let activeTags = new Set(['val','let rec','type']);
+let expanded = null;
+
+function setMod(mod, btn) {
+  activeMod = mod;
+  document.querySelectorAll('.mod-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function toggleTag(tag, btn) {
+  if (activeTags.has(tag)) activeTags.delete(tag);
+  else activeTags.add(tag);
+  btn.classList.toggle('on', activeTags.has(tag));
+  render();
+}
+
+function hl(str, q) {
+  if (!q) return str;
+  const re = new RegExp(`(${q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi');
+  return str.replace(re, '<span class="hl">$1</span>');
+}
+
+function render() {
+  const q = document.getElementById('q').value.trim().toLowerCase();
+  const filtered = DATA.filter(d => {
+    if (activeMod && d.mod !== activeMod) return false;
+    if (!activeTags.has(d.kind)) return false;
+    if (q && !d.name.toLowerCase().includes(q) && !d.doc.toLowerCase().includes(q) && !d.sig.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  document.getElementById('res-count').textContent = `${filtered.length} result${filtered.length!==1?'s':''}`;
+  const el = document.getElementById('cards');
+  if (!filtered.length) {
+    el.innerHTML = '<div class="empty">No matching definitions.</div>';
+    return;
+  }
+  el.innerHTML = filtered.map((d,i) => {
+    const isExp = expanded === d.name;
+    return `<div class="def-card${isExp?' expanded':''}" onclick="toggle('${d.name}')">
+      <div class="def-header">
+        <span class="def-name">${hl(d.name, q)}</span>
+        <span class="def-mod">${d.mod}</span>
+        <span class="def-mod" style="background:none">${d.kind}</span>
+        <span class="def-line">line ${d.line}</span>
+        <span class="def-link"><a href="${d.mod}.html#${d.name}">${d.mod}/${d.name}</a></span>
+      </div>
+      <div class="def-sig">${hl(d.sig, q)}</div>
+      <div class="def-doc">${hl(d.doc, q)}</div>
+    </div>`;
+  }).join('');
+}
+
+function toggle(name) {
+  expanded = expanded === name ? null : name;
+  render();
+}
+
+render();
+</script>
+</body>
+</html>

@@ -160,6 +160,10 @@
   padding: 5px 5px 5px 5px;
 }
 
+.def-section + .def-section {
+  margin-top: 12px;
+}
+
 .def-card {
   border: 0.5px solid var(--color-border-tertiary);
   border-radius: var(--border-radius-md);

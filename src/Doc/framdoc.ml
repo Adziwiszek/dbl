@@ -98,9 +98,7 @@ let write_module_page m =
         if name = "" 
           then
            Printf.sprintf
-             {|<div id="glob-doc" class="glob-doc">
-                 <p>%s on line %d</p>
-               </div>|} doc line
+             {|<div id="glob-doc" class="md-doc"> %s </div>|} doc
           else
            Printf.sprintf
              {|<div id="%s" class="def-section">

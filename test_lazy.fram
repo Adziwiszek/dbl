@@ -26,11 +26,6 @@ let pureRef {type X} = (extern dbl_ref    : X -> Ref X)
 method get {type X}  = (extern dbl_refGet : Ref X ->[] X)
 method set {type X}  = (extern dbl_refSet : Ref X -> X ->[] Unit)
 
-{##
-to jest randmomowy komentrrza
-
-##}
-
 ## Internal representation of lazy state
 data LazyState A =
   | Thunk of (Unit ->[] A)

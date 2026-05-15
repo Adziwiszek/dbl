@@ -113,6 +113,7 @@ let write_module_page m =
     html_above m.mod_name entries_html html_below;
   close_out oc
 
+  (*
 let write_index modules =
   let fname = Filename.concat !output_dir "index.html" in
   let oc = open_out fname in
@@ -124,6 +125,7 @@ let write_index modules =
   in
   Printf.fprintf oc "%s<ul>%s</ul>%s" html_above links html_below;
   close_out oc
+  *)
 
 let write_search_data modules =
   let fname = Filename.concat !output_dir "search_data.js" in
@@ -195,19 +197,18 @@ let write_doc_html output_dir all_entries modules =
   in
   let sidebar = sidebar_modules modules in
   let total = List.length all_entries in
+  let links = modules
+    |> List.map (fun m ->
+        Printf.sprintf {|<li><a href="%s">%s</a> (%d definitions)</li>|}
+          m.mod_html m.mod_name (List.length m.mod_entries))
+    |> String.concat "\n" in
 
-  let html = Printf.sprintf html_search total sidebar json_data in
+  (*let html = Printf.sprintf html_search total sidebar json_data in*)
   let path = Filename.concat output_dir "search.html" in
   let oc = open_out path in
-  output_string oc html;
+  (* output_string oc html;*)
   Printf.fprintf oc "%s<ul>%s</ul>%s" html_above links html_below;
   close_out oc
-
-(** squeezes spaces *)
-let squeeze_spaces : string -> string = fun s ->
-  s |> String.split_on_char ' '
-    |> List.filter (fun x -> x <> "")
-    |> String.concat " "
 
 (** creates a paragraph *)
 let make_paragraph : string -> string -> int -> string = fun name doc line ->
@@ -252,6 +253,8 @@ let _ =
   write_search_data modules;
   write_doc_html !output_dir !all_entries modules;
   List.iter write_module_page modules;
-  write_index modules;
+  (*write_index modules;*)
   write_doc_css !output_dir;
+  List.map (fun m -> m.mod_entries) modules |>
+  List.iter print_docs;
   Printf.printf "Docs written to %s/\n" !output_dir;

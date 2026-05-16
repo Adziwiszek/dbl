@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>FramDoc</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/9.1.6/marked.min.js"></script>
+</head>
+
+<body>
+
+  <div class="sidebar">
+    <h2>Fram</h2>
+    (tutaj wstaw obrazek)
+  </div>
+
+  <div class="main">
+    <h1><a href="index.html">Dokumentacja</a></h1>
+    <h2><a href="search.html">Wyszukiwarka</a></h2>
+
+    {{entries}}
+  </div>
+
+  <script>
+    document.querySelectorAll('.md-doc').forEach(el => {
+      el.innerHTML = marked.parse(el.textContent);
+    });
+  </script>
+</body>
+
+</html>

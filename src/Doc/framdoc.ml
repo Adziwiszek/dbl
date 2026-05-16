@@ -27,16 +27,15 @@ pomysł: ukradnij env z EffectInference i z niego wyczytaj typy zmiennych
 
 
 TODO:
-  wyciągnąć html i css z pliku ml 
-  jak poprawnie przeszukiwać drzewo ast
-  printować to co jest w ppt
-  połączyć to z lekserem
-  zrobić ładną stronę
+  1) sidebar w dokumentacji
+  2) dodać informacje o pozycji do ConE
 *)
 
 open Printf
 
 let output_dir = ref "docs"
+
+(* File handling =========================================================== *)
 
 (** Reads file and returns its content *)
 let read_file fname =
@@ -62,12 +61,40 @@ let rec collect_files dir =
       acc
   ) [] entries
 
+(* Html templates ========================================================== *)
+
 (** html templates *)
 
-let html_above = read_file "src/Doc/html_templates/head.html"
+let html_above = "src/Doc/html_templates/module.html"
+let html_index = "src/Doc/html_templates/index.html"
 let html_below = read_file "src/Doc/html_templates/foot.html"
 let html_search = read_file "src/Doc/html_templates/search_page.html"
 
+(** Replaces all occurences of sub with repl in string s *)
+let replace_template s sub repl =
+  let buf = Buffer.create (String.length s) in
+  let slen = String.length s in
+  let sublen = String.length sub in
+  let i = ref 0 in
+  while !i <= slen - sublen do
+    if String.sub s !i sublen = sub then begin
+      Buffer.add_string buf repl;
+      i := !i + sublen
+    end else begin
+      Buffer.add_char buf s.[!i];
+      incr i
+    end
+  done;
+  if !i < slen then Buffer.add_string buf (String.sub s !i (slen - !i));
+  Buffer.contents buf
+
+let render_html template bindings =
+  List.fold_left
+    (fun acc (key, value) -> replace_template acc ("{{" ^ key ^ "}}") value)
+    template
+    bindings
+
+(* IR of a single entry ==================================================== *)
 
 (** # Definition entries in a module *)
 
@@ -114,6 +141,8 @@ let entry_to_json e =
     (js_escape e.e_sig)
     (js_escape (html_escape e.e_doc))
 
+(* IR of modules =========================================================== *)
+
 (** Single module *)
 
 type module_doc = {
@@ -126,6 +155,7 @@ type module_doc = {
 let write_module_page m =
   let fname = Filename.concat !output_dir m.mod_html in
   let oc = open_out fname in
+  let html_template = read_file html_above in
   let entries_html = m.mod_entries
     |> List.map (fun (name, doc, line) ->
         if name = "" 
@@ -140,20 +170,25 @@ let write_module_page m =
                </div>|} name name line doc)
     |> String.concat "\n"
   in
-  Printf.fprintf oc "%s<h2>%s</h2>%s%s"
-    html_above m.mod_name entries_html html_below;
+  let module_page = Printf.sprintf "<h1>%s</h1>%s" 
+    m.mod_name entries_html in
+  render_html html_template ["entries", module_page] |> Printf.fprintf oc "%s";
   close_out oc
+
+(* Filling templates ======================================================= *)
 
 let write_index modules =
   let fname = Filename.concat !output_dir "index.html" in
   let oc = open_out fname in
+  let html_template = read_file html_index in
   let links = modules
     |> List.map (fun m ->
         Printf.sprintf {|<li><a href="%s">%s</a> (%d definitions)</li>|}
           m.mod_html m.mod_name (List.length m.mod_entries))
     |> String.concat "\n"
   in
-  Printf.fprintf oc "%s<ul>%s</ul>%s" html_above links html_below;
+  let index_page = Printf.sprintf "<ul class=\"module-list\">%s</ul>" links in
+  render_html html_template ["page", index_page] |> Printf.fprintf oc "%s";
   close_out oc
 
 let write_doc_css output_dir =
@@ -169,6 +204,8 @@ let print_docs docs =
   printf "found %d docs\n" (List.length docs);
   List.iter (fun (name, content, line) ->
     printf "%s (line: %d)\n%s\n" name line content) docs
+
+(* Prog arguments ========================================================== *)
 
 let fnames : string list ref = ref []
 
@@ -186,6 +223,8 @@ let proc_arg arg =
     fnames := collect_files arg
   else
     fnames := [arg]
+
+(* Main ==================================================================== *)
 
 let _ =
   Arg.parse cmd_args_options proc_arg usage_string;

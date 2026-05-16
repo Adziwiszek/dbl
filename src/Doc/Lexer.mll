@@ -1,40 +1,43 @@
+(** Documentation lexer *)
+
 {
-  let doc_buffer = Buffer.create 256
+let doc_buffer = Buffer.create 256
 
-  let print_buffer () =
-    let content = String.trim (Buffer.contents doc_buffer) in
-    print_endline content
+let print_buffer () =
+  let content = String.trim (Buffer.contents doc_buffer) in
+  print_endline content
 
-  type pending =
-    | NoPending
-    (* Starting line *)
-    | PendingLine of int
+type pending =
+  | NoPending
+  (* Starting line *)
+  | PendingLine of int
 
-  let pending : pending ref = ref NoPending
-  let doc_comments : (string * string * int) list ref = ref []
+let pending : pending ref = ref NoPending
+let doc_comments : (string * string * int) list ref = ref []
 
-  let getline lexbuf = lexbuf.Lexing.lex_curr_p.Lexing.pos_lnum 
+let getline lexbuf = lexbuf.Lexing.lex_curr_p.Lexing.pos_lnum 
 
-  let start_doc lexbuf = 
-    match !pending with
-    | NoPending -> pending := PendingLine (getline lexbuf)
-    | PendingLine _ -> 
-        print_buffer ();
-        failwith "A doc comment is already pending"
+let start_doc lexbuf = 
+  match !pending with
+  | NoPending -> pending := PendingLine (getline lexbuf)
+  | PendingLine _ -> 
+      print_buffer ();
+      failwith "A doc comment is already pending"
 
-  let add_doc name lexbuf =
-    let line = 
-      match !pending with 
-      | NoPending -> getline lexbuf
-      | PendingLine l -> pending := NoPending; l
-    in
-    let content = String.trim (Buffer.contents doc_buffer) in
-    doc_comments := (name, content, line) :: !doc_comments;
-    Buffer.clear doc_buffer
+let add_doc name lexbuf =
+  let line = 
+    match !pending with 
+    | NoPending -> getline lexbuf
+    | PendingLine l -> pending := NoPending; l
+  in
+  let content = String.trim (Buffer.contents doc_buffer) in
+  doc_comments := (name, content, line) :: !doc_comments;
+  Buffer.clear doc_buffer
 
-  let reset_doc () =
-    Buffer.clear doc_buffer;
-    doc_comments := []
+let reset_doc () =
+  Buffer.clear doc_buffer;
+  doc_comments := []
+
 }
 
 rule main_rule = parse
@@ -170,12 +173,12 @@ and skip_to_next_line = parse
 
 
 {
-  let main fname =
-    reset_doc ();
-    let inchan = open_in fname in 
-    let lexbuf = Lexing.from_channel inchan in
-    main_rule lexbuf;
-    close_in inchan;
-    List.rev !doc_comments
+let main fname =
+  reset_doc ();
+  let inchan = open_in fname in 
+  let lexbuf = Lexing.from_channel inchan in
+  main_rule lexbuf;
+  close_in inchan;
+  List.rev !doc_comments
 }
-    
+

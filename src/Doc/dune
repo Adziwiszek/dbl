@@ -6,6 +6,7 @@
   (optional)
   (modules framdoc Lexer)
   (libraries
+    unix
     yojson
     uri
     dblParser

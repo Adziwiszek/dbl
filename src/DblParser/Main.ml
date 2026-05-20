@@ -9,7 +9,7 @@ type fname = string
 let parse_file ?pos ~use_prelude fname =
   let imports, prog = File.parse_defs ?pos fname in
   let make data = { prog with data } in
-  let prog = make (Lang.Surface.EDefs(prog.data, make Lang.Surface.EUnit)) in
+  let prog = make (Lang.Surface.EDefs(prog.data, make Lang.Surface.EToplevelEnd)) in
   Import.prepend_imports ~use_prelude imports prog
 
 let make_nowhere data =

@@ -23,6 +23,8 @@ module rec TCFix : TCFix = struct
     Def.check_defs ~tcfix:(module TCFix) env defs tp_req cont
 end
 
+(* todo dodac mape z identyfikatorow w dane o wiazaniu *)
+
 let tr_program p =
   let er = TCFix.check_expr_type Env.initial p T.Type.t_unit in
   ConstrSolve.solve_all er.er_constr;

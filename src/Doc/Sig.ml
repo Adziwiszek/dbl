@@ -1,5 +1,22 @@
-(* TODO:
+(*
+TODO:
   odzyskać typy z interpretera
+
+  którego kontekstu używać w pprinterze?
+
+  mapa w inferencji typów i efektów
+
+  zapisać mapę do pliku (nazwa, pozycja, schemat) albo w bibliotece przekazać
+
+  Zmienić nazwę EUnit
+
+  ident w surface.ml dodać pozycje (zrobić z niego node)
+
+  pamiętać gdzie wiążemy daną zmienną (zostawić możliwość dodawania nowych 
+  potrzebnych danych)
+
+  zbierać pptree (kontekst dla pprinter) do mapy definicji
+
   *)
 
 (*

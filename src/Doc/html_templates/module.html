@@ -13,6 +13,14 @@
   <div class="sidebar">
     <h2>Fram</h2>
     (tutaj wstaw obrazek)
+
+    <div class="search">
+      {{search}}
+    </div>
+
+    <div class="mod-index">
+      {{mod_index}}
+    </div>
   </div>
 
   <div class="main">
@@ -25,6 +33,11 @@
   <script>
     document.querySelectorAll('.md-doc').forEach(el => {
       el.innerHTML = marked.parse(el.textContent);
+    });
+
+    document.querySelectorAll('.sidebar-hdr').forEach(el => {
+      el.innerHTML = 
+        `<a href="${document.location.href}#${el.textContent}">${el.textContent}</a>`
     });
   </script>
 </body>

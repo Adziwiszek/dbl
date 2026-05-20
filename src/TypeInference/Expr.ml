@@ -31,7 +31,6 @@ let infer_expr_type ~tcfix ?app_type env (e : S.expr) =
     { er with er_type = Infered tp }
 
   | EToplevelEnd ->
-    print_endline "top level end";
     { er_expr   = make (T.EInst(make (T.ECtor([], T.PE_Unit, 0)), [], []));
       er_type   = Infered T.Type.t_unit;
       er_effect = Pure;

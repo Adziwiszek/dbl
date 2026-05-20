@@ -304,7 +304,7 @@ let rec guess_rec_fun_type env (e : S.expr) tp =
       rfb_body_tp = tp
     }, T.Impure
 
-  | EUnit | ENum _ | ENum64 _ | EStr _ | EChr _ | EPoly _ | EApp _ | EDefs _
+  | EToplevelEnd| ENum _ | ENum64 _ | EStr _ | EChr _ | EPoly _ | EApp _ | EDefs _
   | EMatch _ | EHandler _ | EEffect _ | EExtern _ | ERepl _ ->
     let pp = Env.pp_tree env in
     { rfb_type    = { T.pos = pos; T.pp = pp; T.data = T.TE_Type tp };

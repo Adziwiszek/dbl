@@ -28,7 +28,9 @@ pomysł: ukradnij env z EffectInference i z niego wyczytaj typy zmiennych
 
 TODO:
   1) sidebar w dokumentacji
+    a) Headery
   2) dodać informacje o pozycji do ConE
+
 *)
 
 open Printf
@@ -63,12 +65,8 @@ let rec collect_files dir =
 
 (* Html templates ========================================================== *)
 
-(** html templates *)
-
 let html_above = "src/Doc/html_templates/module.html"
 let html_index = "src/Doc/html_templates/index.html"
-let html_below = read_file "src/Doc/html_templates/foot.html"
-let html_search = read_file "src/Doc/html_templates/search_page.html"
 
 (** Replaces all occurences of sub with repl in string s *)
 let replace_template s sub repl =
@@ -88,11 +86,35 @@ let replace_template s sub repl =
   if !i < slen then Buffer.add_string buf (String.sub s !i (slen - !i));
   Buffer.contents buf
 
-let render_html template bindings =
+let render_html : string -> (string * string) list -> string = 
+  fun template  bindings ->
   List.fold_left
     (fun acc (key, value) -> replace_template acc ("{{" ^ key ^ "}}") value)
     template
     bindings
+
+let extract_header doc = 
+  let doc = String.trim doc in
+  let is_header = List.exists 
+   (fun pre -> String.starts_with ~prefix:pre doc) ["# "; "## "; "### "] in
+  if is_header then
+    Some (String.split_on_char '\n' doc |> List.hd)
+  else
+    None
+
+let strip_header s =
+  let hdrs = ["# "; "## "; "### "] in
+  let rec aux hdrs =
+    match hdrs with
+    | [] -> s
+    | h :: hdrs ->
+      if String.starts_with ~prefix:h s
+      then 
+        let h_len = String.length h in
+        String.sub s h_len ((String.length s) - h_len)
+      else 
+        aux hdrs
+  in aux hdrs
 
 (* IR of modules =========================================================== *)
 
@@ -102,30 +124,52 @@ type module_doc = {
   mod_name : string;
   mod_path : string;
   mod_html : string;
-  mod_entries : (string * string * int) list; (* name, doc, line *)
+  (* (name, doc, line) list *)
+  mod_entries : (string * string * int) list; 
 }
 
 let write_module_page m =
   let fname = Filename.concat !output_dir m.mod_html in
   let oc = open_out fname in
   let html_template = read_file html_above in
+
   let entries_html = m.mod_entries
     |> List.map (fun (name, doc, line) ->
         if name = "" 
           then
-           Printf.sprintf
-             {|<div id="glob-doc" class="md-doc"> %s </div>|} doc
+            let id = 
+              match extract_header doc with
+              | None -> "glob-doc"
+              | Some h -> strip_header h
+            in
+            Printf.sprintf
+             {|<div id="%s" class="md-doc"> %s </div>|} id doc
           else
-           Printf.sprintf
+            Printf.sprintf
              {|<div id="%s" class="def-section">
                  <h3><code>val %s</code> <span class="line">line %d</span></h3>
                  <p>%s</p>
                </div>|} name name line doc)
-    |> String.concat "\n"
+    |> String.concat "\n" in
+
+  let sidebar_headers = 
+    m.mod_entries
+      |> List.filter_map (fun (name, doc, line) ->
+        if name <> "" then None else extract_header doc 
+      )
+      |> List.map strip_header
+      |> List.map (fun hdr ->
+          "<div class=\"sidebar-hdr\">" ^ 
+          hdr ^ "</a></div>"
+          (* <a href="${document.location.href}#${el.textContent}">${el.textContent}</a> *)
+      )
+      |> String.concat "\n"
+
   in
-  let module_page = Printf.sprintf "<h1>%s</h1>%s" 
-    m.mod_name entries_html in
-  render_html html_template ["entries", module_page] |> Printf.fprintf oc "%s";
+  let module_page = Printf.sprintf "<h1>%s</h1>%s" m.mod_name entries_html in
+  [("entries", module_page); ("mod_index", sidebar_headers)]
+    |> render_html html_template  
+    |> Printf.fprintf oc "%s";
   close_out oc
 
 (* Filling templates ======================================================= *)
@@ -187,10 +231,6 @@ let _ =
   let modules = List.map (fun path ->
     let entries = Lexer.main path in
     let mod_name = path |> Filename.basename |> Filename.remove_extension in
-    List.iter (fun (name, doc, line) ->
-      add_entry mod_name name line doc
-    )
-    entries;
     { mod_name;
       mod_path = path;
       mod_html = mod_name ^ ".html";

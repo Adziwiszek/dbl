@@ -30,7 +30,7 @@ let infer_expr_type ~tcfix ?app_type env (e : S.expr) =
     let er = check_expr_type env e tp in
     { er with er_type = Infered tp }
 
-  | EUnit ->
+  | EToplevelEnd ->
     { er_expr   = make (T.EInst(make (T.ECtor([], T.PE_Unit, 0)), [], []));
       er_type   = Infered T.Type.t_unit;
       er_effect = Pure;
@@ -269,7 +269,7 @@ let check_expr_type ~tcfix env (e : S.expr) tp =
   let pp = Env.pp_tree env in
   let make data = T.{ pos; pp; data } in
   match e.data with
-  | EUnit | ENum _ | ENum64 _ | EStr _ | EChr _ | EPoly _ | EApp _
+  | EToplevelEnd| ENum _ | ENum64 _ | EStr _ | EChr _ | EPoly _ | EApp _
   | EAnnot _ | EAnnotEff _ | EAnnotTotal _ ->
     check_expr_type_default ~tcfix env e tp
 

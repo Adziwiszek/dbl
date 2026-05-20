@@ -51,6 +51,7 @@ type name =
 type is_public = bool
 
 (** Identifier, i.e., object that can be bound in patterns *)
+(* todo zrobic z tego ident_data node *)
 type ident =
   | IdVar      of var
   | IdImplicit of iname
@@ -230,7 +231,7 @@ and poly_expr_def_data =
 (** Expressions *)
 and expr = expr_data node
 and expr_data =
-  | EUnit
+  | EToplevelEnd (* todo: zmienic na EToplevelEnd *)
     (** Unit expression. Used only as the expression after the last definition
       in a program. *)
 

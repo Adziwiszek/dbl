@@ -25,11 +25,7 @@ let start_doc lexbuf =
       failwith "A doc comment is already pending"
 
 let add_doc name lexbuf =
-  let line = 
-    match !pending with 
-    | NoPending -> getline lexbuf
-    | PendingLine l -> pending := NoPending; l
-  in
+  let line = getline lexbuf in
   let content = String.trim (Buffer.contents doc_buffer) in
   doc_comments := (name, content, line) :: !doc_comments;
   Buffer.clear doc_buffer
@@ -42,8 +38,8 @@ let reset_doc () =
 
 rule main_rule = parse
   (* Documentation comments *)
-  | "{##" { start_doc lexbuf; gather_block_doc lexbuf }
-  | "##" { start_doc lexbuf; gather_line_doc lexbuf }
+  | "{##" {  gather_block_doc lexbuf }
+  | "##" {  gather_line_doc lexbuf }
 
   (* Normal comments => skip *)
   | "{#" { skip_comment true lexbuf; main_rule lexbuf }

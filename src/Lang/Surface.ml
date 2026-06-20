@@ -58,6 +58,13 @@ type ident =
   | IdMethod   of method_name
     (** Methods must have an arrow type, where the argument type is a type
       of "self" variable. *)
+let print_ident (iden: ident) = 
+  begin match iden with
+    | IdVar       var -> var
+    | IdImplicit  iname -> iname
+    | IdMethod   method_name -> method_name
+  end
+  |> fun s -> print_endline ("Ident: " ^ s)
 
 (** Kind expressions *)
 type kind_expr = kind_expr_data node
@@ -231,7 +238,7 @@ and poly_expr_def_data =
 (** Expressions *)
 and expr = expr_data node
 and expr_data =
-  | EToplevelEnd (* todo: zmienic na EToplevelEnd *)
+  | EToplevelEnd
     (** Unit expression. Used only as the expression after the last definition
       in a program. *)
 
@@ -375,10 +382,29 @@ and def_data =
     (** Print type, evaluate, and print the expression, provided by a user in
       REPL. *)
 
+
 (** Pattern-matching clauses *)
 and match_clause = match_clause_data node
 and match_clause_data =
   | Clause of pattern * expr
 
+let string_of_expr_data = function
+  | EToplevelEnd -> "EToplevelEnd"
+  | ENum _ -> "ENum"
+  | ENum64 _ -> "ENum64"
+  | EStr _ -> "EStr"
+  | EChr _ -> "EChr"
+  | EPoly _ -> "EPoly"
+  | EFn _ -> "EFn"
+  | EApp _ -> "EApp"
+  | EDefs _ -> "EDefs"
+  | EMatch _ -> "EMatch"
+  | EHandler _ -> "EHandler"
+  | EEffect _ -> "EEffect"
+  | EExtern _ -> "EExtern"
+  | EAnnot _ -> "EAnnot"
+  | EAnnotEff _ -> "EAnnotEff"
+  | EAnnotTotal _ -> "EAnnotTotal"
+  | ERepl _ -> "ERepl"
 (** Program *)
 type program = expr

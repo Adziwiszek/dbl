@@ -6,6 +6,23 @@
 
 open Common
 
+(** Map from a variable to a structure that remembers its type.
+    Used for generating documentation. *)
+type var_info =
+  { line_num : int
+  }
+let make_var_info line = { line_num = line }
+module UidMap = Map.Make(UID)
+type s = var_info UidMap.t
+
+let empty_var_map : s = UidMap.empty
+
+let print_var_map vmap =
+  let vlist : (UID.t * var_info) list = UidMap.to_list vmap in
+  List.iter (fun (uid, vinfo) -> 
+    (UID.to_string uid) ^ ": " ^ (string_of_int vinfo.line_num) |> print_endline)
+    vlist
+
 (** The state of the environment. It is indexed by four types: current state
     of the environment, the two type parameters to the [opn] state of the
     module being defined, and the state that represents the rest of the
@@ -44,17 +61,20 @@ type 'st t =
     scope          : Scope.t;
       (** Scope of type variables *)
 
-    param_env      : ParamEnv.t
+    param_env      : ParamEnv.t;
       (** Management of section parameters *)
+
+    var_map        : s ref
   } -> 'st t
 
-let empty =
+let empty initial_var_map =
   Env {
     cur_module     = Module.empty;
     mod_stack      = MStack (StModule, Nil);
     pp_tree        = PPTree.empty;
     scope          = Scope.initial;
-    param_env      = ParamEnv.empty
+    param_env      = ParamEnv.empty;
+    var_map        = initial_var_map
   }
 
 (* ========================================================================= *)
@@ -113,6 +133,11 @@ let add_val ?(public=false) (Env env) name sch =
       cur_module = Module.add_val ~public env.cur_module name x sch
     } in
   (env, x)
+
+
+let add_var_info (Env env) uid line =
+  env.var_map := UidMap.add uid line !(env.var_map);
+  (Env env)
 
 let add_implicit ?public env name sch =
   add_val ?public env (NImplicit name) sch
@@ -272,11 +297,11 @@ let option_adt =
     Module.adt_effect = Pure
   }
 
-let initial =
+let initial initial_var_map =
   let env = 
     List.fold_left
       (fun env (name, x) -> add_existing_tvar env name x)
-      empty
+      (empty initial_var_map)
       T.BuiltinType.all in
   let env = add_adt env T.BuiltinType.tv_unit unit_adt in
   let env = add_ctor env "()" 0 unit_adt in

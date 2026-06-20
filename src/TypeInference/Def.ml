@@ -30,6 +30,14 @@ let unfold_alias_in_type_resp (type dir) ~scope (resp : (T.typ, dir) response) :
     end
   | Checked -> Checked
 
+let print_type pp (x: Var.t) = 
+  let dupa = PPTree.lookup pp (PP_UID x.uid) in
+  match dupa with
+  | Found s -> print_endline ("Found: " ^ s)
+  | Anon(s, _) -> print_endline ("Type was found bot is not representable")
+  | Unbound _ -> print_endline "Type was not found"
+
+
 (* ------------------------------------------------------------------------- *)
 let check_def : type st dir. tcfix:tcfix ->
   (st, sec) opn Env.t -> S.def -> (T.typ, dir) request ->
@@ -47,9 +55,15 @@ let check_def : type st dir. tcfix:tcfix ->
       T.data = data
     } in
   let pos = def.pos in
+  (* print_endline "checking def";
+  (string_of_int pos.pos_start_line) ^ "" |> print_string;
+  print_endline ""; *)
   let pp = Env.pp_tree env in
   match def.data with
   | DLetId(public, id, body) ->
+    (* tutaj jest let definicja z surface.ml *)
+     "DLetId on line " ^ (string_of_int pos.pos_end_line) |> print_endline;
+    (* S.print_ident id; *)
     let (body_env, params) = Env.begin_generalize env in
     begin match PolyExpr.infer_def_scheme ~tcfix body_env body with
     | PPure(body, sch, cs) ->
@@ -59,7 +73,16 @@ let check_def : type st dir. tcfix:tcfix ->
       let (body, sch) = ExprUtils.generalize ~pos ~pp targs named body sch in
       let name = NameUtils.tr_ident ~pos ~pp id sch in
       let (env, x) = Env.add_val ~public env name sch in
+      let var_info = (Env.make_var_info def.pos.pos_start_line) in
+      let env = Env.add_var_info env x.uid var_info in
       let rest = cont.run env req in
+      (* print_type pp x;
+      let typek = bidir_result req rest.er_type |> T.Type.view in
+      begin match typek with
+      | TVar _ -> print_endline "Variable"
+      | TArrow _ -> print_endline "Function"
+      | _ -> print_endline "not implemented"
+      end;  *)
       { er_expr   = make rest (T.ELetPoly(x, body, rest.er_expr));
         er_type   = rest.er_type;
         er_effect = rest.er_effect;
@@ -220,6 +243,7 @@ let check_def : type st dir. tcfix:tcfix ->
 
   | DSection defs ->
     let env = Env.enter_section env in
+    print_endline "Def.ml: check_def, DSection";
     check_defs env defs req
       { run = fun env req ->
         cont.run (Env.leave_section env) req }
@@ -246,6 +270,7 @@ let check_def : type st dir. tcfix:tcfix ->
   | DModule(public, name, defs) ->
     let env = Env.enter_module env in
     let env = Env.enter_section env in
+    print_endline "Def.ml: check_def, DModule";
     check_defs env defs req
       { run = fun env req ->
         let env = Env.leave_section env in
@@ -284,6 +309,7 @@ let check_defs : type st dir. tcfix:tcfix ->
     st def_cont -> dir expr_result =
   fun ~tcfix env defs req cont ->
   let open (val tcfix : TCFix) in
+  print_endline "Def.ml: check_defs";
   match defs with
   | [] -> cont.run env req
   | def :: defs ->

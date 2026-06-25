@@ -416,5 +416,6 @@ let string_of_expr_data = function
   | EAnnotEff _ -> "EAnnotEff"
   | EAnnotTotal _ -> "EAnnotTotal"
   | ERepl _ -> "ERepl"
+  | EHandlerFn _ -> "EHandlerFn"
 (** Program *)
 type program = expr

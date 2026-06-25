@@ -6,23 +6,6 @@
 
 open Common
 
-(** Map from a variable to a structure that remembers its type.
-    Used for generating documentation. *)
-type var_info =
-  { line_num : int
-  }
-let make_var_info line = { line_num = line }
-module UidMap = Map.Make(UID)
-type s = var_info UidMap.t
-
-let empty_var_map : s = UidMap.empty
-
-let print_var_map vmap =
-  let vlist : (UID.t * var_info) list = UidMap.to_list vmap in
-  List.iter (fun (uid, vinfo) -> 
-    (UID.to_string uid) ^ ": " ^ (string_of_int vinfo.line_num) |> print_endline)
-    vlist
-
 (** The state of the environment. It is indexed by four types: current state
     of the environment, the two type parameters to the [opn] state of the
     module being defined, and the state that represents the rest of the
@@ -64,7 +47,7 @@ type 'st t =
     param_env      : ParamEnv.t;
       (** Management of section parameters *)
 
-    var_map        : s ref
+    var_map        : VarMap.t ref
   } -> 'st t
 
 let empty initial_var_map =
@@ -135,8 +118,8 @@ let add_val ?(public=false) (Env env) name sch =
   (env, x)
 
 
-let add_var_info (Env env) uid line =
-  env.var_map := UidMap.add uid line !(env.var_map);
+let add_var_info (Env env) uid vinfo =
+  env.var_map := VarMap.add_var_info !(env.var_map) uid vinfo;
   (Env env)
 
 let add_implicit ?public env name sch =
@@ -298,6 +281,11 @@ let option_adt =
   }
 
 let initial initial_var_map =
+  let initial_var_map =
+    begin match initial_var_map with
+    | Some vmap -> vmap
+    | None -> ref VarMap.empty_var_map
+    end in
   let env = 
     List.fold_left
       (fun env (name, x) -> add_existing_tvar env name x)

@@ -4,7 +4,6 @@
 type var_info =
   { line_num : int
   ; var_name : string 
-
   }
 
 let make_var_info line name = 

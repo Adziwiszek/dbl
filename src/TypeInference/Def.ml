@@ -72,7 +72,6 @@ let check_def : type st dir. tcfix:tcfix ->
       let (body, sch) = ExprUtils.generalize ~pos ~pp targs named body sch in
       let name = NameUtils.tr_ident ~pos ~pp id sch in
       let (env, x) = Env.add_val ~public env name sch in
-     "let " ^ x.name ^ " on line " ^ (string_of_int pos.pos_end_line) |> print_endline;
       let var_info = (VarMap.make_var_info pos.pos_end_line x.name) in
       let env = Env.add_var_info env x var_info in
       let rest = cont.run env req in

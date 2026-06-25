@@ -25,11 +25,11 @@ end
 
 (* todo dodac mape z identyfikatorow w dane o wiazaniu *)
 
-let tr_program p =
-  let initial_var_map : Env.s ref = ref Env.empty_var_map in
-  let env_init = (Env.initial initial_var_map) in
+let tr_program ?var_map p =
+  let env_init = (Env.initial var_map) in
   let er = TCFix.check_expr_type env_init p T.Type.t_unit in
   ConstrSolve.solve_all er.er_constr;
   InterpLib.Error.assert_no_error ();
-  Env.print_var_map !initial_var_map;
+  print_endline "type inference";
+  Option.iter (fun x -> VarMap.print_var_map !x) var_map;
   er.er_expr

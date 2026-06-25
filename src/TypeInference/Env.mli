@@ -6,24 +6,13 @@
 
 open Common
 
-(** Record with information about a variable (type, line number). *)
-type var_info
-
-val make_var_info : int -> var_info
-(** Map from uid to var_info. *)
-type s
-
-(** Empty map for variables. *)
-val empty_var_map : s
-(** Debug printing of variable map. *)
-val print_var_map : s -> unit
 
 (** Environments indexed with their current state. See [Common] module for
   details. *)
 type 'st t
 
 (** Initial environment *)
-val initial : s ref -> closed t
+val initial : VarMap.t ref option -> closed t
 
 (* ========================================================================= *)
 
@@ -56,7 +45,7 @@ val add_type_alias :
 val add_val :
   ?public:bool -> 'st t -> Name.t -> T.scheme -> 'st t * T.var
 
-val add_var_info : 'st t -> UID.t -> var_info -> 'st t
+val add_var_info : 'st t -> UID.t -> VarMap.var_info -> 'st t
 
 (** Extend the environment with a polymorphic named implicit. *)
 val add_implicit :

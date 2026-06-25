@@ -33,8 +33,9 @@ let set_module_dirs ?fname () =
   DblConfig.local_search_dirs := cur_dir :: !DblConfig.local_search_dirs
 
 let core_pipeline prog =
+  let var_map = ref VarMap.empty_var_map in
   prog
-  |> TypeInference.Main.tr_program
+  |> TypeInference.Main.tr_program ~var_map:var_map
   |> EffectInference.Main.tr_program ~solve_all:true
   |> dump_sexpr !dump_cone Lang.ConE.to_sexpr
   |> ToCore.Main.tr_program

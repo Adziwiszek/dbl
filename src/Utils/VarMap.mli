@@ -8,6 +8,6 @@ type t
 (** Empty map for variables. *)
 val empty_var_map : t
 (** Adds variable info to the var map *)
-val add_var_info : t -> UID.t -> var_info -> t
+val add_var_info : var_info Var.Map.t -> Var.t -> var_info -> var_info Var.Map.t
 (** Debug printing of variable map. *)
-val print_var_map : t -> unit
+val print_var_map : var_info Var.Map.t -> unit

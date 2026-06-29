@@ -62,7 +62,6 @@ let check_def : type st dir. tcfix:tcfix ->
   match def.data with
   | DLetId(public, id, body) ->
     (* tutaj jest let definicja z surface.ml *)
-     "DLetId on line " ^ (string_of_int pos.pos_end_line) |> print_endline;
     (* S.print_ident id; *)
     let (body_env, params) = Env.begin_generalize env in
     begin match PolyExpr.infer_def_scheme ~tcfix body_env body with
@@ -73,16 +72,10 @@ let check_def : type st dir. tcfix:tcfix ->
       let (body, sch) = ExprUtils.generalize ~pos ~pp targs named body sch in
       let name = NameUtils.tr_ident ~pos ~pp id sch in
       let (env, x) = Env.add_val ~public env name sch in
-      let var_info = (VarMap.make_var_info def.pos.pos_start_line x.name) in
-      let env = Env.add_var_info env x.uid var_info in
+     "let " ^ x.name ^ " on line " ^ (string_of_int pos.pos_end_line) |> print_endline;
+      let var_info = (VarMap.make_var_info pos.pos_end_line x.name) in
+      let env = Env.add_var_info env x var_info in
       let rest = cont.run env req in
-      (* print_type pp x;
-      let typek = bidir_result req rest.er_type |> T.Type.view in
-      begin match typek with
-      | TVar _ -> print_endline "Variable"
-      | TArrow _ -> print_endline "Function"
-      | _ -> print_endline "not implemented"
-      end;  *)
       { er_expr   = make rest (T.ELetPoly(x, body, rest.er_expr));
         er_type   = rest.er_type;
         er_effect = rest.er_effect;

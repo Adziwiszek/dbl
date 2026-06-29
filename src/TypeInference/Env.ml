@@ -47,7 +47,7 @@ type 'st t =
     param_env      : ParamEnv.t;
       (** Management of section parameters *)
 
-    var_map        : VarMap.t ref
+    var_map        : VarMap.var_info Var.Map.t ref
   } -> 'st t
 
 let empty initial_var_map =
@@ -118,8 +118,8 @@ let add_val ?(public=false) (Env env) name sch =
   (env, x)
 
 
-let add_var_info (Env env) uid vinfo =
-  env.var_map := VarMap.add_var_info !(env.var_map) uid vinfo;
+let add_var_info (Env env) key vinfo =
+  env.var_map := Var.Map.add key vinfo !(env.var_map);
   (Env env)
 
 let add_implicit ?public env name sch =
@@ -284,7 +284,7 @@ let initial initial_var_map =
   let initial_var_map =
     begin match initial_var_map with
     | Some vmap -> vmap
-    | None -> ref VarMap.empty_var_map
+    | None -> ref Var.Map.empty
     end in
   let env = 
     List.fold_left

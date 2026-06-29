@@ -5,4 +5,4 @@
 (** Main module of a type inference *)
 
 (** Infer types in a program and translate it to the Unif language *)
-val tr_program : ?var_map:VarMap.t ref -> Lang.Surface.program ->  Lang.Unif.program
+val tr_program : ?var_map:VarMap.var_info Var.Map.t ref -> Lang.Surface.program ->  Lang.Unif.program

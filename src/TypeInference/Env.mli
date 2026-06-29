@@ -12,7 +12,7 @@ open Common
 type 'st t
 
 (** Initial environment *)
-val initial : VarMap.t ref option -> closed t
+val initial : VarMap.var_info Var.Map.t ref option -> closed t
 
 (* ========================================================================= *)
 
@@ -45,7 +45,7 @@ val add_type_alias :
 val add_val :
   ?public:bool -> 'st t -> Name.t -> T.scheme -> 'st t * T.var
 
-val add_var_info : 'st t -> UID.t -> VarMap.var_info -> 'st t
+val add_var_info : 'st t -> Var.t -> VarMap.var_info -> 'st t
 
 (** Extend the environment with a polymorphic named implicit. *)
 val add_implicit :

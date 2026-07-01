@@ -12,11 +12,10 @@ let make_var_info line name =
   ; var_name = name 
   }
 
-module UidMap = Map.Make(UID)
 (** Type for variable map. *)
-type t = var_info UidMap.t
+type t = var_info Var.Map.t
 
-let empty_var_map : t = UidMap.empty
+let empty = Var.Map.empty
 
 let add_var_info vmap uid vinfo = Var.Map.add uid vinfo vmap
 

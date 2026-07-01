@@ -6,8 +6,8 @@
 
 open Common
 
-let tr_program ~solve_all p =
-  let env = Env.initial ~solve_all () in
+let tr_program ~solve_all ~docmap p =
+  let env = Env.initial ~solve_all ~docmap () in
   let (e, Checked) =
     Expr.check_type env p
       (T.Type.t_var T.BuiltinType.tv_unit)

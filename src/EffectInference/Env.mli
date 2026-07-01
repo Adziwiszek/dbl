@@ -27,7 +27,7 @@ type adt_info =
 type t
 
 (** Initial environment that contains built-in types *)
-val initial : solve_all:bool -> unit -> t
+val initial : solve_all:bool -> docmap:VarMap.t ref option -> unit -> t
 
 (** Add a type variable to the environment. It returns the extended environment,
   and the refreshed type variable in ConE representation. *)

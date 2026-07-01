@@ -7,4 +7,5 @@
 (** The main function of the translation. The [solve_all] flag indicates the
   behavior of the constraint solving: when set all constraints are solved.
   Otherwise, it only checks if constraints are solvable. *)
-val tr_program : solve_all:bool -> Lang.Unif.program -> Lang.ConE.program
+val tr_program : solve_all:bool -> docmap:VarMap.t ref option -> 
+  Lang.Unif.program -> Lang.ConE.program

@@ -51,7 +51,7 @@ let core_pipeline prog =
   prog
   |> print_timing "type inference" (TypeInference.Main.tr_program ~var_map:var_map)
   |> print_timing "effect inference"
-       (EffectInference.Main.tr_program ~solve_all:true)
+       (EffectInference.Main.tr_program ~solve_all:true ~docmap:None)
   |> dump_sexpr !dump_cone Lang.ConE.to_sexpr
   |> print_timing "to Core" ToCore.Main.tr_program
   |> dump_sexpr !dump_core Lang.Core.to_sexpr
@@ -64,7 +64,7 @@ let nocore_pipeline prog =
   prog
   |> print_timing "type inference" TypeInference.Main.tr_program
   |> print_timing "effect inference"
-       (EffectInference.Main.tr_program ~solve_all:false)
+       (EffectInference.Main.tr_program ~solve_all:false ~docmap:None)
   |> dump_sexpr !dump_cone Lang.ConE.to_sexpr
   |> print_timing "type erasure" ConETypeErase.tr_program
   |> print_timing "evaluation" Eval.eval_program

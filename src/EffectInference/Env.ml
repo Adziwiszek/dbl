@@ -25,6 +25,9 @@ type t =
     var_map : var_info Var.Map.t;
     (** Map from variables to their type schemes *)
 
+    var_doc_map : VarMap.t ref option;
+    (** Map from variables to their documentation information *)
+
     adt_map : adt_info Var.Map.t;
     (** Map from ADT shape variables to their information *)
 
@@ -50,7 +53,7 @@ type t =
       [EffectInference.Main] for details. *)
   }
 
-let initial ~solve_all () =
+let initial ~solve_all ~docmap () =
   let add_builtin tvar_map (name, x) =
     let y = List.assoc name T.BuiltinType.all in
     S.TVar.Map.add x y tvar_map
@@ -60,6 +63,7 @@ let initial ~solve_all () =
   { tvar_map     = tvar_map;
     var_map      = Var.Map.empty;
     adt_map      = Var.Map.empty;
+    var_doc_map  = docmap;
     ty_alias_map = S.TyAlias.Map.empty;
     scope        = Scope.initial;
     constr       = ConstrSet.create ();

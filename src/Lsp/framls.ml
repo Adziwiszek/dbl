@@ -59,7 +59,7 @@ let type_check path =
   try
     DblParser.Main.parse_file ~use_prelude:true path
     |> TypeInference.Main.tr_program
-    |> EffectInference.Main.tr_program ~solve_all:true
+    |> EffectInference.Main.tr_program ~solve_all:true ~docmap:None
     |> ToCore.Main.tr_program
     |> ignore;
   with

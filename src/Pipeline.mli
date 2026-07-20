@@ -21,3 +21,6 @@ val run_repl : unit -> unit
 
 (** Run single file as a program. It takes file path as a parameter. *)
 val run_file : string -> unit
+
+(** Compile a single file to a C program. *)
+val compile_to_c : string -> unit

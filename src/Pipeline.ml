@@ -60,6 +60,18 @@ let core_pipeline prog =
   |> print_timing "type erasure" CoreTypeErase.tr_program
   |> print_timing "evaluation" Eval.eval_program
 
+let cps_pipeline prog =
+  let var_map = ref Var.Map.empty in
+  prog
+  |> TypeInference.Main.tr_program ~var_map:var_map
+  |> EffectInference.Main.tr_program ~solve_all:true ~docmap:None
+  |> dump_sexpr !dump_cone Lang.ConE.to_sexpr
+  |> ToCore.Main.tr_program
+  |> dump_sexpr !dump_core Lang.Core.to_sexpr
+  |> check_invariant true Lang.Core.check_well_typed
+  |> CoreTypeErase.tr_program
+  |> ToCPS.Main.tr_program
+
 let nocore_pipeline prog =
   prog
   |> print_timing "type inference" TypeInference.Main.tr_program
@@ -78,3 +90,8 @@ let run_file fname =
   set_module_dirs ~fname ();
   DblParser.Main.parse_file ~use_prelude:!use_prelude fname
   |> core_pipeline
+
+let compile_to_c fname =
+  set_module_dirs ~fname ();
+  DblParser.Main.parse_file ~use_prelude:!use_prelude fname
+  |> cps_pipeline; ()

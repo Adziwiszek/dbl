@@ -2,7 +2,8 @@
  * See LICENSE for details.
  *)
 
-include CPSPriv.Syntax
+(** Translating CPS to S-expressions *)
 
-let to_sexpr = CPSPriv.SExprPrinter.tr_program
+open Syntax
 
+val tr_program : program -> SExpr.t

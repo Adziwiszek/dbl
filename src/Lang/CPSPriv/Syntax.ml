@@ -1,8 +1,3 @@
-(* This file is part of DBL, released under MIT license.
- * See LICENSE for details.
- *)
-
-(** CPS Language. It is the result of translation from Untyped language. *)
 
 type var = Var.t
 
@@ -31,8 +26,4 @@ type cexp =
 	| Primop of primop * value list * var list * cexp list
   | Halt of value
 
-(** Program *)
 type program = cexp
-
-(** Produce S-expression that represents given program *)
-val to_sexpr : program -> SExpr.t

@@ -55,6 +55,7 @@ let cps_pipeline prog =
   |> check_invariant true Lang.Core.check_well_typed
   |> CoreTypeErase.tr_program
   |> ToCPS.Main.tr_program
+  |> dump_sexpr true Lang.CPS.to_sexpr
 
 let nocore_pipeline prog =
   prog

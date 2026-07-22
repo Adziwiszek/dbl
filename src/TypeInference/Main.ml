@@ -30,6 +30,5 @@ let tr_program ?var_map p =
   let er = TCFix.check_expr_type env_init p T.Type.t_unit in
   ConstrSolve.solve_all er.er_constr;
   InterpLib.Error.assert_no_error ();
-  print_endline "type inference";
-  Option.iter (fun x -> VarMap.print_var_map !x) var_map;
+  (* Option.iter (fun x -> VarMap.print_var_map !x) var_map; *)
   er.er_expr

@@ -31,7 +31,6 @@ let infer_expr_type ~tcfix ?app_type env (e : S.expr) =
     { er with er_type = Infered tp }
 
   | EToplevelEnd ->
-    print_endline "top level end";
     { er_expr   = make (T.EInst(make (T.ECtor([], T.PE_Unit, 0)), [], []));
       er_type   = Infered T.Type.t_unit;
       er_effect = Pure;
@@ -39,7 +38,6 @@ let infer_expr_type ~tcfix ?app_type env (e : S.expr) =
     }
 
   | ENum n ->
-    print_endline "infer_expr_type: ENum";
     { er_expr   = make (T.ENum n);
       er_type   = Infered (T.Type.t_var T.BuiltinType.tv_int);
       er_effect = Pure;
@@ -47,7 +45,6 @@ let infer_expr_type ~tcfix ?app_type env (e : S.expr) =
     }
 
   | ENum64 n ->
-    print_endline "infer_expr_type: ENum64";
     { er_expr   = make (T.ENum64 n);
       er_type   = Infered (T.Type.t_var T.BuiltinType.tv_int64);
       er_effect = Pure;
@@ -74,7 +71,6 @@ let infer_expr_type ~tcfix ?app_type env (e : S.expr) =
       (Inst.instantiate_poly_expr ~tcfix ~pos env e sch inst)
 
   | EFn(pat, body) ->
-    print_endline "Infering EFn in Expr.ml";
     let tp2 = Env.fresh_uvar ~pos:body.pos env T.Kind.k_type in
     let (env, pat, sch_expr, eff1) = Pattern.infer_scheme_ext env pat in
     let sch = T.SchemeExpr.to_scheme sch_expr in
@@ -112,7 +108,6 @@ let infer_expr_type ~tcfix ?app_type env (e : S.expr) =
     end
 
   | EDefs(defs, e) ->
-    print_endline "Definitions in infer expr.ml";
     let env = Env.enter_section env in
     check_defs env defs Infer
       { run = fun env req ->
@@ -276,7 +271,6 @@ let check_expr_type ~tcfix env (e : S.expr) tp =
   match e.data with
   | EToplevelEnd| ENum _ | ENum64 _ | EStr _ | EChr _ | EPoly _ | EApp _
   | EAnnot _ | EAnnotEff _ | EAnnotTotal _ ->
-    (* print_endline "checking default type"; *)
     check_expr_type_default ~tcfix env e tp
 
   | EFn(pat, body) ->
@@ -305,9 +299,7 @@ let check_expr_type ~tcfix env (e : S.expr) tp =
     end
 
   | EDefs(defs, e) ->
-    (* S.string_of_expr_data e.data |> print_endline; *)
     let env = Env.enter_section env in
-    print_endline ("Definitions in check expr.ml, on line " ^ (string_of_int e.pos.pos_start_line));
     check_defs env defs (Check tp)
       { run = fun env req ->
           let env = Env.leave_section env in

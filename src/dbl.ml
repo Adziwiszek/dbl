@@ -104,7 +104,8 @@ let _ =
         See %s -help for details.\n"
         Sys.argv.(0);
       exit 2
-    | Some fname -> Pipeline.run_file fname
+    (*| Some fname -> Pipeline.run_file fname*)
+    | Some fname -> Pipeline.compile_to_c fname
   with
   | InterpLib.Error.Fatal_error -> exit 1
   | Eval.Runtime_error -> exit 2

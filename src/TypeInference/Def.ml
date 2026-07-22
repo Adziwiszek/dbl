@@ -55,14 +55,9 @@ let check_def : type st dir. tcfix:tcfix ->
       T.data = data
     } in
   let pos = def.pos in
-  (* print_endline "checking def";
-  (string_of_int pos.pos_start_line) ^ "" |> print_string;
-  print_endline ""; *)
   let pp = Env.pp_tree env in
   match def.data with
   | DLetId(public, id, body) ->
-    (* tutaj jest let definicja z surface.ml *)
-    (* S.print_ident id; *)
     let (body_env, params) = Env.begin_generalize env in
     begin match PolyExpr.infer_def_scheme ~tcfix body_env body with
     | PPure(body, sch, cs) ->
@@ -235,7 +230,6 @@ let check_def : type st dir. tcfix:tcfix ->
 
   | DSection defs ->
     let env = Env.enter_section env in
-    print_endline "Def.ml: check_def, DSection";
     check_defs env defs req
       { run = fun env req ->
         cont.run (Env.leave_section env) req }
@@ -262,7 +256,6 @@ let check_def : type st dir. tcfix:tcfix ->
   | DModule(public, name, defs) ->
     let env = Env.enter_module env in
     let env = Env.enter_section env in
-    print_endline "Def.ml: check_def, DModule";
     check_defs env defs req
       { run = fun env req ->
         let env = Env.leave_section env in
@@ -301,7 +294,6 @@ let check_defs : type st dir. tcfix:tcfix ->
     st def_cont -> dir expr_result =
   fun ~tcfix env defs req cont ->
   let open (val tcfix : TCFix) in
-  print_endline "Def.ml: check_defs";
   match defs with
   | [] -> cont.run env req
   | def :: defs ->

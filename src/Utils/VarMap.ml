@@ -21,7 +21,6 @@ let add_var_info vmap uid vinfo = Var.Map.add uid vinfo vmap
 
 (** Debugging printing of variables stored in the map. *)
 let print_var_map vmap =
-  print_endline "Var map = ";
   let vlist = Var.Map.to_list vmap in
   List.iter (fun (uid, vinfo) -> 
     (Var.unique_name uid) ^ ": " ^ 

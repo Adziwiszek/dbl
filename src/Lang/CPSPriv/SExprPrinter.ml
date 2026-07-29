@@ -6,6 +6,6 @@ open Syntax
 
 let rec tr_expr (p : cexp) =
   match p with
-  | _ -> failwith "tr_expr not implemented"
+  | _ -> failwith "tr_expr for sexpr not implemented"
 
 let tr_program = tr_expr

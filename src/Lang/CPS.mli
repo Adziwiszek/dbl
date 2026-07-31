@@ -23,10 +23,20 @@ type primop =
 
 type cexp =
 	| Record of (value * accesspath) list * var * cexp
+  | Ctor of int * value list
 	| Select of int * value * var * cexp
 	| Offset of int * value * var * cexp 
 	| App of value * value list
+  (** Application of a function to its arguments. *)
+
 	| Fix of (var * var list * cexp) list * cexp
+  (** List of mutually recursive functions.
+      Tuple `var * var list * cexp` represents a function:
+      - `var`, a variable this function is bound to
+      - `var list`, function arguments
+      - `cexp`, function body
+   *)
+
 	| Switch of value * cexp list
 	| Primop of primop * value list * var list * cexp list
   | Halt of value

@@ -18,6 +18,7 @@ type primop =
 
 type cexp =
 	| Record of (value * accesspath) list * var * cexp
+  | Ctor of int * value list
 	| Select of int * value * var * cexp
 	| Offset of int * value * var * cexp 
 	| App of value * value list

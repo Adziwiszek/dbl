@@ -18,18 +18,20 @@ let rec tr_expr (e : S.expr) (c : cont) : T.program =
   | S.EValue v -> tr_value v c
 
   | S.ELet(v, e1, e2) -> 
+    print_endline "cps let";
     (* Classic trick, we turn `let x = e1 in e2` into `(fun x -> e2) e1` *)
     tr_expr e1 (fun e1_cps ->
       (* Variable for function `(fun x -> e2)` *)
       let f = Var.fresh () in
       let e2_cps = (f, [v], tr_expr e2 c) in
       (* Create `(fun x -> e2)` ad hoc and immediately apply it to e1 *)
-      T.Fix([e2_cps], (T.App((T.Var f), [e1_cps]))
-    ))
+      T.Fix([e2_cps], (T.App((T.Var f), [e1_cps])))
+    )
 
   | S.ELetRec _ -> failwith "letrec"
 
   | S.EFn(v, e) -> 
+    print_endline "cps fun";
     (* Variable that this function is bound to in the continuation *)
     let f = Var.fresh () in
     (* Continuation to invoke upon function exit *)
@@ -52,12 +54,14 @@ let rec tr_expr (e : S.expr) (c : cont) : T.program =
     in T.Fix([ret_fun], cont)
 
   (* TODO: "eval" values here *)
-  | S.ECtor(n, values) -> T.Ctor(n, [])
+  | S.ECtor(n, values) -> 
+    print_endline "cps ctor";
+    T.Ctor(n, [])
 
   | S.EMatch(v, clauses) -> failwith "ematch"
   | S.ELabel _ -> failwith "label"
-  | EShift _ -> failwith "shift"
-  | EReset _ -> failwith "reset"
+  | S.EShift _ -> failwith "shift"
+  | S.EReset _ -> failwith "reset"
   | _ -> failwith "tr_expr to cps not implemented"
 
 and tr_value (v : S.value) (c : cont) =

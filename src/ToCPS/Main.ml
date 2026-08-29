@@ -28,7 +28,6 @@ let rec tr_expr (e : S.expr) (c : cont) : T.program =
   | S.EValue v -> tr_value v c
 
   | S.ELet(v, e1, e2) -> 
-    print_endline "cps let";
     (* Classic trick, we turn `let x = e1 in e2` into `(fun x -> e2) e1` *)
     tr_expr e1 (fun e1_cps ->
       (* Variable for function `(fun x -> e2)` *)
@@ -41,37 +40,51 @@ let rec tr_expr (e : S.expr) (c : cont) : T.program =
   | S.ELetRec _ -> failwith "letrec"
 
   | S.EFn(v, e) -> 
-    print_endline "cps fun";
     (* Variable that this function is bound to in the continuation *)
     let f = Var.fresh () in
     (* Continuation to invoke upon function exit *)
     let k = Var.fresh () in
     (* Function f takes its original argument v along with continuation k.
-       When it finishes it will bind its result to z. Finally the continuation 
-       is applied to that result.
+       When it finishes it will bind its result to e_cps. Finally the 
+       continuation is applied to that result.
     *)
-    let cps_fun = (f, [v; k], tr_expr e (fun z -> T.App(T.Var k, [z]))) in 
+    let cps_fun = (f, [v; k], tr_expr e (fun e_cps -> T.App(T.Var k, [e_cps]))) in 
     T.Fix([cps_fun], c (T.Var f))
 
+  (* Function f applied to value v TODO: good description *)
   | S.EApp(f, v) ->
-    (* "Return address" *)
-    let r = Var.fresh () in
+    (* Return address *)
+    let ret_addr = Var.fresh () in
     let x = Var.fresh () in
-    let ret_fun = (r, [x], c (T.Var x)) in
-    let cont = tr_expr f (fun f_ -> 
-      tr_value v (fun v_ -> T.App(f_, [v_; T.Var r]))
+    let ret_fun = (ret_addr, [x], c (T.Var x)) in
+    let cont = tr_expr f (fun cexp_body -> 
+      tr_value v (fun v_ -> T.App(cexp_body, [v_; T.Var ret_addr]))
       ) 
     in T.Fix([ret_fun], cont)
 
   | S.ECtor(n, values) -> 
-    print_endline "cps ctor";
     let v = Var.fresh() in
     (* TODO: idk if this is 100% correct way to convert values.
      Right now can't think of anything else. *)
     let converted_values = List.map convert_value values in
     T.Ctor(n, converted_values, v, c (T.Var v))
 
-  | S.EMatch(v, clauses) -> failwith "ematch"
+  | S.EMatch(v, clauses) -> 
+    tr_value v (fun v_cps -> 
+      (* Create a function k that represents rest of the computation *)
+      let k = Var.fresh () in
+      let x = Var.fresh () in
+      let c_as_fun = (k, [x], c (T.Var x)) in
+      (* Translate the clauses *)
+      let tr_clause = fun (vars, e) -> 
+        (**)
+        (vars, tr_expr e (fun e_cps -> T.App(T.Var k, [e_cps]))) in
+      let cps_clauses = List.map tr_clause clauses in
+
+      T.Fix([c_as_fun], T.Switch(v_cps, cps_clauses))
+    ) 
+
+  (* TODO: Algebraic effects *)
   | S.ELabel _ -> failwith "label"
   | S.EShift _ -> failwith "shift"
   | S.EReset _ -> failwith "reset"

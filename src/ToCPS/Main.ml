@@ -7,12 +7,6 @@ open Common
 type cont = T.value -> T.cexp 
 
 
-let tr_lit (l : S.lit) (c : cont) =
-  match l with
-  | S.LNum n -> c (T.Int n)
-  | S.LStr s -> c (T.String s) 
-  | _ -> failwith "tr_lit not implemented"
-
 let rec tr_expr (e : S.expr) (c : cont) : T.program =
   match e with
   | S.EValue v -> tr_value v c
@@ -56,7 +50,8 @@ let rec tr_expr (e : S.expr) (c : cont) : T.program =
   (* TODO: "eval" values here *)
   | S.ECtor(n, values) -> 
     print_endline "cps ctor";
-    T.Ctor(n, [])
+    let v = Var.fresh() in
+    T.Ctor(n, [], v, c (T.Var v))
 
   | S.EMatch(v, clauses) -> failwith "ematch"
   | S.ELabel _ -> failwith "label"
@@ -70,6 +65,13 @@ and tr_value (v : S.value) (c : cont) =
   | S.VLit l -> tr_lit l c
   (* TODO: figure out extern in cps*)
   | S.VExtern s -> c (T.Int 42)
+
+and tr_lit (l : S.lit) (c : cont) =
+  match l with
+  | S.LNum n -> c (T.Int n)
+  | S.LStr s -> c (T.String s) 
+  | _ -> failwith "tr_lit not implemented"
+
 
 let init_cont v = T.Halt v
 

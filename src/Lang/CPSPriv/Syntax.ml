@@ -17,10 +17,7 @@ type primop =
   | Lt | Lte | Gt | Gte
 
 type cexp =
-	| Record of (value * accesspath) list * var * cexp
-  | Ctor of int * value list
-	| Select of int * value * var * cexp
-	| Offset of int * value * var * cexp 
+  | Ctor of int * value list * var * cexp
 	| App of value * value list
 	| Fix of (var * var list * cexp) list * cexp
 	| Switch of value * cexp list

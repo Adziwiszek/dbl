@@ -22,7 +22,7 @@ let rec tr_expr (e : cexp) : SExpr.t =
   | Fix _ -> tr_fn e
 	| Switch _ -> failwith "Switch sexpr not implemented" 
 	| Primop _ -> failwith "Primop sexpr not implemented" 
-  | Halt _ -> failwith "Halt sexpr not implemented" 
+  | Halt _ -> Sym "Halt"
 
 and tr_fn (e : cexp) : SExpr.t =
   let aux_tr_fn x : SExpr.t = 

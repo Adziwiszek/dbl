@@ -6,6 +6,22 @@ open Common
 
 type cont = T.value -> T.cexp 
 
+let convert_lit (l : S.lit) : T.value =
+  match l with
+  | S.LNum n -> T.Int n
+  | S.LStr s -> T.String s
+  | _ -> failwith "convert_lit not implemented"
+
+(** Right now used to convert values for ADT constructors.
+    Doesn't use continuation on the value, just rawdogs it
+    into CPS
+*)
+let convert_value (v : S.value) : T.value =
+  match v with
+  | S.VVar v -> T.Var v
+  | S.VLit l -> convert_lit l
+  (* TODO: figure out extern in cps*)
+  | S.VExtern s -> T.Int 42
 
 let rec tr_expr (e : S.expr) (c : cont) : T.program =
   match e with
@@ -47,11 +63,13 @@ let rec tr_expr (e : S.expr) (c : cont) : T.program =
       ) 
     in T.Fix([ret_fun], cont)
 
-  (* TODO: "eval" values here *)
   | S.ECtor(n, values) -> 
     print_endline "cps ctor";
     let v = Var.fresh() in
-    T.Ctor(n, [], v, c (T.Var v))
+    (* TODO: idk if this is 100% correct way to convert values.
+     Right now can't think of anything else. *)
+    let converted_values = List.map convert_value values in
+    T.Ctor(n, converted_values, v, c (T.Var v))
 
   | S.EMatch(v, clauses) -> failwith "ematch"
   | S.ELabel _ -> failwith "label"

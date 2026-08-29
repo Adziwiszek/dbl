@@ -22,10 +22,14 @@ type primop =
   | Lt | Lte | Gt | Gte
 
 type cexp =
-	| Record of (value * accesspath) list * var * cexp
-  | Ctor of int * value list
-	| Select of int * value * var * cexp
-	| Offset of int * value * var * cexp 
+  | Ctor of int * value list * var * cexp
+  (** Fully applied constructor of ADT.
+      `int`, identifier
+      `value list`, converted values that this ctor was applied to
+      `var`, a variable this constructor will be bound to
+      `cexp`, continuation
+   *)
+
 	| App of value * value list
   (** Application of a function to its arguments. *)
 

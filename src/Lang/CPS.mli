@@ -10,16 +10,7 @@ type value =
 	| Var of var
 	| Label of var
 	| Int of int
-	| Real of string
 	| String of string
-
-type accesspath =
-	| OFFp of int
-	| SELp of int * accesspath
-	
-type primop = 
-  | Plus | Mult | Minus | Div
-  | Lt | Lte | Gt | Gte
 
 type cexp =
   | Ctor of int * value list * var * cexp
@@ -41,9 +32,17 @@ type cexp =
       - `cexp`, function body
    *)
 
-	| Switch of value * cexp list
-	| Primop of primop * value list * var list * cexp list
+	| Switch of value * clause list
+  (** 
+      `value`, thing being matched
+      `clause list`, list of clauses
+  *)
+
   | Halt of value
+
+and clause = var list * cexp
+(** List of variables that will be bound to values of a constructor
+  and claues body. *)
 
 (** Program *)
 type program = cexp

@@ -6,6 +6,8 @@ open Common
 
 type cont = T.value -> T.cexp 
 
+let cps_conversion_error err_msg = failwith ("CPS conversion error: " ^ err_msg)
+
 let convert_lit (l : S.lit) : T.value =
   match l with
   | S.LNum n -> T.Int n
@@ -37,7 +39,19 @@ let rec tr_expr (e : S.expr) (c : cont) : T.program =
       T.Fix([e2_cps], (T.App((T.Var f), [e1_cps])))
     )
 
-  | S.ELetRec _ -> failwith "letrec"
+  | S.ELetRec(fns, e)->
+    let rec aux_tr_fn fns =
+      match fns with
+      | [] -> []
+      | (v, e) :: fns' -> 
+          (* Fresh function name *)
+          let f = Var.fresh () in
+          (* Continuation that f will receive *)
+          let k = Var.fresh () in
+          let f_body = tr_expr e (fun e_cps -> T.App(T.Var k, [e_cps])) in
+          (f, [v; k], f_body) :: aux_tr_fn fns'
+    in 
+    T.Fix(aux_tr_fn fns, tr_expr e c)
 
   | S.EFn(v, e) -> 
     (* Variable that this function is bound to in the continuation *)
@@ -48,8 +62,8 @@ let rec tr_expr (e : S.expr) (c : cont) : T.program =
        When it finishes it will bind its result to e_cps. Finally the 
        continuation is applied to that result.
     *)
-    let cps_fun = (f, [v; k], tr_expr e (fun e_cps -> T.App(T.Var k, [e_cps]))) in 
-    T.Fix([cps_fun], c (T.Var f))
+    let f_body = tr_expr e (fun e_cps -> T.App(T.Var k, [e_cps])) in
+    T.Fix([(f, [v; k], f_body)], c (T.Var f))
 
   (* Function f applied to value v TODO: good description *)
   | S.EApp(f, v) ->
@@ -88,7 +102,7 @@ let rec tr_expr (e : S.expr) (c : cont) : T.program =
   | S.ELabel _ -> failwith "label"
   | S.EShift _ -> failwith "shift"
   | S.EReset _ -> failwith "reset"
-  | _ -> failwith "tr_expr to cps not implemented"
+  | S.ERepl _ | S.EReplExpr _ -> cps_conversion_error "Can't translate REPL commands (ERepl | EReplExpr)"
 
 and tr_value (v : S.value) (c : cont) =
   match v with

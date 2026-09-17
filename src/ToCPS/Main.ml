@@ -12,7 +12,7 @@ let convert_lit (l : S.lit) : T.value =
   match l with
   | S.LNum n -> T.Int n
   | S.LStr s -> T.String s
-  | _ -> failwith "convert_lit not implemented"
+  | S.LNum64 n -> T.Int64 n
 
 (** Right now used to convert values for ADT constructors.
     Doesn't use continuation on the value, just rawdogs it
@@ -115,7 +115,7 @@ and tr_lit (l : S.lit) (c : cont) =
   match l with
   | S.LNum n -> c (T.Int n)
   | S.LStr s -> c (T.String s) 
-  | _ -> failwith "tr_lit not implemented"
+  | S.LNum64 n -> c (T.Int64 n)
 
 
 let init_cont v = T.Halt v

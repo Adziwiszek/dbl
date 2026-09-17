@@ -10,6 +10,7 @@ type value =
 	| Var of var
 	| Label of var
 	| Int of int
+  | Int64 of int64
 	| String of string
 
 type cexp =

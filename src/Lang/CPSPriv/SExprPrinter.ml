@@ -12,6 +12,7 @@ let tr_value v =
 	| Var v -> tr_var v
 	| Label v -> tr_var v
 	| Int n -> Sym (string_of_int n)
+  | Int64 n -> Sym (Int64.to_string n)
 	| String s -> Sym (Printf.sprintf "\"%s\"" (String.escaped s))
 
 let rec tr_expr (e : cexp) : SExpr.t =

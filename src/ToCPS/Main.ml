@@ -22,8 +22,7 @@ let convert_value (v : S.value) : T.value =
   match v with
   | S.VVar v -> T.Var v
   | S.VLit l -> convert_lit l
-  (* TODO: figure out extern in cps*)
-  | S.VExtern s -> T.Int 42
+  | S.VExtern s -> T.Extern s
 
 let rec tr_expr (e : S.expr) (c : cont) : T.program =
   match e with
@@ -108,8 +107,7 @@ and tr_value (v : S.value) (c : cont) =
   match v with
   | S.VVar v -> c (T.Var v) 
   | S.VLit l -> tr_lit l c
-  (* TODO: figure out extern in cps*)
-  | S.VExtern s -> c (T.Int 42)
+  | S.VExtern s -> c (T.Extern s)
 
 and tr_lit (l : S.lit) (c : cont) =
   match l with

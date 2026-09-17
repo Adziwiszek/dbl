@@ -12,6 +12,7 @@ type value =
 	| Int of int
   | Int64 of int64
 	| String of string
+  | Extern of string
 
 type cexp =
   | Ctor of int * value list * var * cexp

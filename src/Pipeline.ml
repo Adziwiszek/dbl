@@ -72,6 +72,7 @@ let cps_pipeline prog =
   |> CoreTypeErase.tr_program
   |> dump_sexpr true Lang.UntypedSExprPrinter.tr_program
   |> ToCPS.Main.tr_program
+  |> Cps.Optimize.opt_program
   |> dump_sexpr true Lang.CPS.to_sexpr
 
 let nocore_pipeline prog =
@@ -96,4 +97,4 @@ let run_file fname =
 let compile_to_c fname =
   set_module_dirs ~fname ();
   DblParser.Main.parse_file ~use_prelude:!use_prelude fname
-  |> cps_pipeline; ()
+    |> cps_pipeline; ()

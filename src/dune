@@ -8,5 +8,5 @@
   (modes byte exe)
   (public_name dbl)
   (libraries interpLib dblParser typeInference effectInference toCore toCPS 
-             eval unix dune-glob)
+             cps eval unix dune-glob)
   (modules dbl pipeline conETypeErase coreTypeErase))

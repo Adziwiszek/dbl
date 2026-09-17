@@ -29,7 +29,6 @@ and tr_fn (e : cexp) : SExpr.t =
       List (Sym "fn" :: tr_var f :: tr_args @ [tr_expr body])
   in
   match e with
-  (* TODO: translate functions *)
   | Fix(fns, c) -> 
       List ( Sym "fix" :: List.map aux_tr_fn fns @ [tr_expr c] )
   | _ -> failwith "tr_fn: Fix expected"

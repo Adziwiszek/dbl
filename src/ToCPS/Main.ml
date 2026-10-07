@@ -15,8 +15,7 @@ let convert_lit (l : S.lit) : T.value =
   | S.LNum64 n -> T.Int64 n
 
 (** Right now used to convert values for ADT constructors.
-    Doesn't use continuation on the value, just rawdogs it
-    into CPS
+    Doesn't use continuation on the value, just rawdogs it into CPS
 *)
 let convert_value (v : S.value) : T.value =
   match v with

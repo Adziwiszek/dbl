@@ -68,6 +68,7 @@ let cps_pipeline prog =
   |> dump_sexpr !dump_core Lang.Core.to_sexpr
   |> check_invariant true Lang.Core.check_well_typed
   |> CoreTypeErase.tr_program
+  (* Moje wyroby *)
   |> dump_sexpr true Lang.UntypedSExprPrinter.tr_program
   |> ToCPS.Main.tr_program
   |> Cps.Optimize.opt_program

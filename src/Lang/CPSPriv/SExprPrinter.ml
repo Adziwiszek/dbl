@@ -55,4 +55,6 @@ and tr_switch e =
     List ( Sym "switch" :: List.map aux_tr_cls cls )
   | _ -> tr_expr e
 
-let tr_program = tr_expr
+let tr_program p = 
+  print_endline "---------- CPS Sexpr ----------";
+  tr_expr p

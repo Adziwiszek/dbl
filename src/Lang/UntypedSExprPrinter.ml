@@ -78,5 +78,5 @@ and tr_clause (xs, body) =
   ]
 
 let tr_program p = 
-  print_endline "translating untyped";
+  print_endline "---------- Untyped Sexpr ----------";
   tr_expr p

@@ -112,6 +112,7 @@ let _ =
         See %s -help for details.\n"
         Sys.argv.(0);
       exit 2
+    (* TODO: Add a choice between compiling and interpreting *)
     (*| Some fname -> Pipeline.run_file fname*)
     | Some fname -> Pipeline.compile_to_c fname
   with

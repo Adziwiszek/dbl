@@ -29,6 +29,10 @@ let cmd_args_options = Arg.align
     Arg.Set Pipeline.dump_core,
     " Dump internal Core representation";
 
+    "-duntyped",
+    Arg.Set Pipeline.dump_untyped,
+    " Dump internal Untyped representation";
+
     "-no-prelude",
     Arg.Clear Pipeline.use_prelude,
     " Disable the prelude";

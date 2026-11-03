@@ -6,6 +6,7 @@
 
 let dump_cone = ref false
 let dump_core = ref false
+let dump_untyped = ref false
 
 let use_prelude = ref true
 
@@ -57,7 +58,7 @@ let core_pipeline prog =
   |> check_invariant true
        (print_timing "Core type-check" Lang.Core.check_well_typed)
   |> print_timing "type erasure" CoreTypeErase.tr_program
-  |> dump_sexpr !dump_core Lang.Untyped.to_sexpr
+  |> dump_sexpr !dump_untyped Lang.Untyped.to_sexpr
   |> print_timing "evaluation" Eval.eval_program
 
 let nocore_pipeline prog =

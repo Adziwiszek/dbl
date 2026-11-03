@@ -57,6 +57,7 @@ let core_pipeline prog =
   |> check_invariant true
        (print_timing "Core type-check" Lang.Core.check_well_typed)
   |> print_timing "type erasure" CoreTypeErase.tr_program
+  |> dump_sexpr !dump_core Lang.Untyped.to_sexpr
   |> print_timing "evaluation" Eval.eval_program
 
 let nocore_pipeline prog =
